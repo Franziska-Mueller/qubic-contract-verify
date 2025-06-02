@@ -3,10 +3,13 @@ project(QubicContractVerify LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(cppparser REQUIRED)
+set(CONTRACT_VERIFY_LIB "contractverify")
+set(CONTRACT_VERIFY_EXE "main")
+add_subdirectory(src)
 
-# Main executable
-add_executable(${PROJECT_NAME} src/qubic_contract_verify.cpp src/check_compliance.cpp src/check_compliance.h)
+set(BUILD_TESTS TRUE CACHE BOOL "Builds the contract verify test project")
 
-# Linking
-target_link_libraries(${PROJECT_NAME} cppparser)
+if(${BUILD_TESTS})
+  set(TEST_EXE "test")
+  add_subdirectory(test)
+endif()
