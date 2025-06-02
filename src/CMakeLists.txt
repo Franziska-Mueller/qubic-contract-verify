@@ -9,7 +9,7 @@ find_package(cppparser REQUIRED)
 add_library(${CONTRACT_VERIFY_LIB} lib/check_compliance.cpp lib/check_compliance.h)
 target_link_libraries(${CONTRACT_VERIFY_LIB} cppparser)
 target_include_directories(${CONTRACT_VERIFY_LIB} 
-  PUBLIC
+  INTERFACE
   ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 # Main executable
