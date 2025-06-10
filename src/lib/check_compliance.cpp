@@ -1,5 +1,6 @@
 #include <deque>
 #include <iostream>
+#include <variant>
 
 #include <cppparser/cppparser.h>
 
@@ -24,6 +25,22 @@ namespace contractverify
             // TODO: push onto scope stack
             return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
             // TODO: pop from scope stack
+        }
+
+        bool checkExpr(const cppast::CppExpression& expression, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            // TODO: Implement this!
+            // 
+            // forbidden:
+            // - pointers
+            // :: (scope resolution, except for structs, enums, and namespaces defined in contracts and qpi.h)
+            // arrays
+            // float/double
+            // / (div), % (mod)
+            // strings, chars
+            // (?) const_cast -> TypeConverter?
+
+            return true;
         }
 
         bool checkVarType(const cppast::CppVarType& varType, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
@@ -54,9 +71,57 @@ namespace contractverify
             return true;
         }
 
+        // helper struct for visiting variants
+        // refer to https://en.cppreference.com/w/cpp/utility/variant/visit2 for details
+        template <class... Ts>
+        struct Overloaded : Ts... { using Ts::operator()...; };
+
         bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            for (const auto& param : params)
+            {
+                if (param.paramType().has_value())
+                {
+                    RETURN_IF_FALSE(
+                        std::visit(Overloaded{ 
+                                [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool 
+                                {
+                                    return checkVarType(*varType, stateStructName, scopeStack);
+                                },
+                                [&](const std::unique_ptr<cppast::CppFunctionPointer>& funcPtr) -> bool 
+                                {
+                                    std::cout << "function pointer is not allowed!" << std::endl;
+                                    return false;
+                                } 
+                            },
+                            param.paramType().value()
+                        )
+                    );
+                }
+
+                // TODO: check that param.paramName() does not use double underscores
+
+                RETURN_IF_FALSE(
+                    std::visit(Overloaded{ 
+                            [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool 
+                            {
+                                if (varType)
+                                    return checkVarType(*varType, stateStructName, scopeStack);
+                                else
+                                    return true;
+                            },
+                            [&](const std::unique_ptr<cppast::CppExpression>& expr) -> bool 
+                            {
+                                if (expr)
+                                    return checkExpr(*expr, stateStructName, scopeStack);
+                                else
+                                    return true;
+                            } 
+                        },
+                        param.defaultArg()
+                    )
+                );
+            }
             return true;
         }
 
@@ -77,6 +142,13 @@ namespace contractverify
             return true;
         }
 
+        bool checkFwdDecl(const cppast::CppForwardClassDecl& fwdDecl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            if (fwdDecl.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(fwdDecl.templateSpecification().value(), stateStructName, scopeStack));
+            return true;
+        }
+
         bool checkTypeConverter(const cppast::CppTypeConverter& converter, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
             if (converter.isTemplated())
@@ -86,22 +158,6 @@ namespace contractverify
 
             if (converter.defn())
                 RETURN_IF_FALSE(checkCompound(*converter.defn(), stateStructName, scopeStack));
-
-            return true;
-        }
-
-        bool checkExpr(const cppast::CppExpression& expression, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
-        {
-            // TODO: Implement this!
-            // 
-            // forbidden:
-            // - pointers
-            // :: (scope resolution, except for structs, enums, and namespaces defined in contracts and qpi.h)
-            // arrays
-            // float/double
-            // / (div), % (mod)
-            // strings, chars
-            // (?) const_cast -> TypeConverter?
 
             return true;
         }
@@ -187,7 +243,8 @@ namespace contractverify
 
         bool checkReturn(const cppast::CppReturnStatement& returnStatement, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            if (returnStatement.hasReturnValue())
+                RETURN_IF_FALSE(checkExpr(returnStatement.returnValue(), stateStructName, scopeStack));
             return true;
         }
 
@@ -274,9 +331,6 @@ namespace contractverify
             case cppast::CppEntityType::GOTO_STATEMENT:
                 return true;
 
-            case cppast::CppEntityType::FORWARD_CLASS_DECL:
-                return true;
-
             case cppast::CppEntityType::PREPROCESSOR:
                 std::cout << "preprocessor directives are not allowed!" << std::endl;
                 return false;
@@ -320,6 +374,9 @@ namespace contractverify
 
             case cppast::CppEntityType::USING_DECL:
                 return checkUsingDecl((const cppast::CppUsingDecl&)entity, stateStructName, scopeStack);
+
+            case cppast::CppEntityType::FORWARD_CLASS_DECL:
+                return checkFwdDecl((const cppast::CppForwardClassDecl&)entity, stateStructName, scopeStack);
 
             case cppast::CppEntityType::TYPE_CONVERTER:
                 return checkTypeConverter((const cppast::CppTypeConverter&)entity, stateStructName, scopeStack);
