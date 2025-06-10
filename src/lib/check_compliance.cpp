@@ -21,7 +21,15 @@ namespace contractverify
 
         bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
+            // TODO: push onto scope stack
             return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
+            // TODO: pop from scope stack
+        }
+
+        bool checkVarType(const cppast::CppVarType& varType, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            // TODO
+            return true;
         }
 
         bool checkVar(const cppast::CppVar& var, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
@@ -46,6 +54,12 @@ namespace contractverify
             return true;
         }
 
+        bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            // TODO
+            return true;
+        }
+
         bool checkUsingNamespace(const cppast::CppUsingNamespaceDecl& decl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
             // TODO: Implement this!
@@ -65,12 +79,15 @@ namespace contractverify
 
         bool checkTypeConverter(const cppast::CppTypeConverter& converter, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
-            // forbidden:
-            // - const_cast
-            // - pointers
-            // - QpiContext
-            return false;
+            if (converter.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(converter.templateSpecification().value(), stateStructName, scopeStack));
+            
+            RETURN_IF_FALSE(checkVarType(*converter.targetType(), stateStructName, scopeStack));
+
+            if (converter.defn())
+                RETURN_IF_FALSE(checkCompound(*converter.defn(), stateStructName, scopeStack));
+
+            return true;
         }
 
         bool checkExpr(const cppast::CppExpression& expression, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
@@ -89,22 +106,83 @@ namespace contractverify
             return true;
         }
 
+        bool checkParamList(const std::vector<const cppast::CppEntity*>& params, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            for (const auto& param : params)
+            {
+                switch (param->entityType())
+                {
+                    case cppast::CppEntityType::VAR:
+                        RETURN_IF_FALSE(checkVar(*static_cast<const cppast::CppVar*>(param), stateStructName, scopeStack));
+                        break;
+                    case cppast::CppEntityType::FUNCTION_PTR:
+                        std::cout << "function pointer is not allowed!" << std::endl;
+                        return false;
+                    default:
+                        std::cout << "unknown CppEntity type in parameter list" << std::endl;
+                        return false;
+                }
+            }
+            return true;
+        }
+
         bool checkConstructor(const cppast::CppConstructor& constr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
-            return false;
+            if (constr.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(constr.templateSpecification().value(), stateStructName, scopeStack));
+
+            const auto params = GetAllParams(constr);
+            if (!params.empty())
+                RETURN_IF_FALSE(checkParamList(params, stateStructName, scopeStack));
+
+            if (constr.hasMemberInitList())
+            {
+                for (const auto& memInit : constr.memberInits())
+                {
+                    // TODO:
+                    // check that memInit.memberName does not start with double underscores
+                    const std::vector<std::unique_ptr<cppast::CppExpression>>& memberInitArgs = memInit.memberInitInfo.args;
+                    for (const auto& arg : memberInitArgs)
+                        RETURN_IF_FALSE(checkExpr(*arg, stateStructName, scopeStack));
+                }
+            }
+
+            if (constr.defn())
+                RETURN_IF_FALSE(checkCompound(*constr.defn(), stateStructName, scopeStack));
+
+            return true;
         }
 
-        bool checkDestructor(const cppast::CppDestructor& constr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        bool checkDestructor(const cppast::CppDestructor& destr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
-            return false;
+            if (destr.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(destr.templateSpecification().value(), stateStructName, scopeStack));
+
+            if (destr.defn())
+                RETURN_IF_FALSE(checkCompound(*destr.defn(), stateStructName, scopeStack));
+
+            return true;
         }
 
-        bool checkFunction(const cppast::CppFunction& constr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        bool checkFunction(const cppast::CppFunction& func, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
+            if (func.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(func.templateSpecification().value(), stateStructName, scopeStack));
+
+            if (func.returnType())
+                RETURN_IF_FALSE(checkVarType(*func.returnType(), stateStructName, scopeStack));
+
             // TODO
-            return false;
+            // check that func.name() does not start with double underscores
+
+            const auto params = GetAllParams(func);
+            if (!params.empty())
+                RETURN_IF_FALSE(checkParamList(params, stateStructName, scopeStack));
+            
+            if (func.defn())
+                RETURN_IF_FALSE(checkCompound(*func.defn(), stateStructName, scopeStack));
+
+            return true;
         }
 
         bool checkReturn(const cppast::CppReturnStatement& returnStatement, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
