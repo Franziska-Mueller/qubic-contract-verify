@@ -3,6 +3,8 @@
 
 #include <cppparser/cppparser.h>
 
+#define RETURN_IF_FALSE(x) if(!x) return false
+
 
 namespace contractverify
 {
@@ -16,6 +18,11 @@ namespace contractverify
         };
 
         bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
+
+        bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
+        }
 
         bool checkVar(const cppast::CppVar& var, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
@@ -108,20 +115,13 @@ namespace contractverify
 
         bool checkIfBlock(const cppast::CppIfBlock& ifBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            if (!checkEntity(*ifBlock.condition(), stateStructName, scopeStack))
-                return false;
+            RETURN_IF_FALSE(checkEntity(*ifBlock.condition(), stateStructName, scopeStack));
             
             if (ifBlock.body())
-            {
-                if (!checkEntity(*ifBlock.body(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkEntity(*ifBlock.body(), stateStructName, scopeStack));
             
             if (ifBlock.elsePart())
-            {
-                if (!checkEntity(*ifBlock.elsePart(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkEntity(*ifBlock.elsePart(), stateStructName, scopeStack));
 
             return true;
         }
@@ -129,39 +129,23 @@ namespace contractverify
         bool checkForBlock(const cppast::CppForBlock& forBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
             if (forBlock.start())
-            {
-                if (!checkEntity(*forBlock.start(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkEntity(*forBlock.start(), stateStructName, scopeStack));
             if (forBlock.stop())
-            {
-                if (!checkExpr(*forBlock.stop(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkExpr(*forBlock.stop(), stateStructName, scopeStack));
             if (forBlock.step())
-            {
-                if (!checkExpr(*forBlock.step(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkExpr(*forBlock.step(), stateStructName, scopeStack));
             if (forBlock.body())
-            {
-                if (!checkEntity(*forBlock.body(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkEntity(*forBlock.body(), stateStructName, scopeStack));
             
             return true;
         }
 
         bool checkWhileBlock(const cppast::CppWhileBlock& whileBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            if (!checkEntity(*whileBlock.condition(), stateStructName, scopeStack))
-                return false;
+            RETURN_IF_FALSE(checkEntity(*whileBlock.condition(), stateStructName, scopeStack));
 
             if (whileBlock.body())
-            {
-                if (!checkEntity(*whileBlock.body(), stateStructName, scopeStack))
-                    return false;
-            }
+                RETURN_IF_FALSE(checkEntity(*whileBlock.body(), stateStructName, scopeStack));
             
             return true;
         }
@@ -169,41 +153,26 @@ namespace contractverify
         bool checkDoWhileBlock(const cppast::CppDoWhileBlock& doWhileBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
             if (doWhileBlock.body())
-            {
-                if (!checkEntity(*doWhileBlock.body(), stateStructName, scopeStack))
-                    return false;
-            }
-            if (!checkEntity(*doWhileBlock.condition(), stateStructName, scopeStack))
-                return false;
+                RETURN_IF_FALSE(checkEntity(*doWhileBlock.body(), stateStructName, scopeStack));
+
+            RETURN_IF_FALSE(checkEntity(*doWhileBlock.condition(), stateStructName, scopeStack));
 
             return true;
         }
 
         bool checkSwitchBlock(const cppast::CppSwitchBlock& switchBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            if (!checkExpr(*switchBlock.condition(), stateStructName, scopeStack))
-                return false;
+            RETURN_IF_FALSE(checkExpr(*switchBlock.condition(), stateStructName, scopeStack));
             
             for (const auto& caseStmt : switchBlock.body())
             {
                 if (caseStmt.caseExpr())
-                {
-                    if (!checkExpr(*caseStmt.caseExpr(), stateStructName, scopeStack))
-                        return false;
-                }
+                    RETURN_IF_FALSE(checkExpr(*caseStmt.caseExpr(), stateStructName, scopeStack));
                 if (caseStmt.body())
-                {
-                    if (!checkCompound(*caseStmt.body(), stateStructName, scopeStack))
-                        return false;
-                }
+                    RETURN_IF_FALSE(checkCompound(*caseStmt.body(), stateStructName, scopeStack));
             }
 
             return true;
-        }
-
-        bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
-        {
-            return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
         }
 
         bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
