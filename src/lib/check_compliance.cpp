@@ -21,21 +21,21 @@ namespace contractverify
         {
             // TODO: Implement this!
             // 
+            // no global variables
+            // 
             // 1.) allowed if it is a global constant and name starts with name of state struct. State struct is the one that inherits from ContractBase
             // 2.) also struct members are allowed! entity.owner returns parent compound (STRUCT vs. BLOCK)
 
-            // not allowed: pointers
+            // not allowed: pointers, arrays, float/double, strings, chars, variadic/parameter pack, double underscores, QpiContext
+            // scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+
+            // input and output structs only use basic types
             return true;
         }
 
         bool checkVarList(const cppast::CppVarList& varList, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
             // TODO: Implement this!
-            // 
-            // 1.) allowed if it is a global constant and name starts with name of state struct. State struct is the one that inherits from ContractBase
-            // 2.) also struct members are allowed! entity.owner returns parent compound (STRUCT vs. BLOCK)
-
-            // not allowed: pointers
             return true;
         }
 
@@ -59,7 +59,10 @@ namespace contractverify
         bool checkTypeConverter(const cppast::CppTypeConverter& converter, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
             // TODO
-            // const_cast is forbidden
+            // forbidden:
+            // - const_cast
+            // - pointers
+            // - QpiContext
             return false;
         }
 
@@ -70,6 +73,11 @@ namespace contractverify
             // forbidden:
             // - pointers
             // :: (scope resolution, except for structs, enums, and namespaces defined in contracts and qpi.h)
+            // arrays
+            // float/double
+            // / (div), % (mod)
+            // strings, chars
+            // (?) const_cast -> TypeConverter?
 
             return true;
         }
@@ -100,31 +108,96 @@ namespace contractverify
 
         bool checkIfBlock(const cppast::CppIfBlock& ifBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            if (!checkEntity(*ifBlock.condition(), stateStructName, scopeStack))
+                return false;
+            
+            if (ifBlock.body())
+            {
+                if (!checkEntity(*ifBlock.body(), stateStructName, scopeStack))
+                    return false;
+            }
+            
+            if (ifBlock.elsePart())
+            {
+                if (!checkEntity(*ifBlock.elsePart(), stateStructName, scopeStack))
+                    return false;
+            }
+
             return true;
         }
 
         bool checkForBlock(const cppast::CppForBlock& forBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            if (forBlock.start())
+            {
+                if (!checkEntity(*forBlock.start(), stateStructName, scopeStack))
+                    return false;
+            }
+            if (forBlock.stop())
+            {
+                if (!checkExpr(*forBlock.stop(), stateStructName, scopeStack))
+                    return false;
+            }
+            if (forBlock.step())
+            {
+                if (!checkExpr(*forBlock.step(), stateStructName, scopeStack))
+                    return false;
+            }
+            if (forBlock.body())
+            {
+                if (!checkEntity(*forBlock.body(), stateStructName, scopeStack))
+                    return false;
+            }
+            
             return true;
         }
 
         bool checkWhileBlock(const cppast::CppWhileBlock& whileBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            if (!checkEntity(*whileBlock.condition(), stateStructName, scopeStack))
+                return false;
+
+            if (whileBlock.body())
+            {
+                if (!checkEntity(*whileBlock.body(), stateStructName, scopeStack))
+                    return false;
+            }
+            
             return true;
         }
 
         bool checkDoWhileBlock(const cppast::CppDoWhileBlock& doWhileBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            if (doWhileBlock.body())
+            {
+                if (!checkEntity(*doWhileBlock.body(), stateStructName, scopeStack))
+                    return false;
+            }
+            if (!checkEntity(*doWhileBlock.condition(), stateStructName, scopeStack))
+                return false;
+
             return true;
         }
 
         bool checkSwitchBlock(const cppast::CppSwitchBlock& switchBlock, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            if (!checkExpr(*switchBlock.condition(), stateStructName, scopeStack))
+                return false;
+            
+            for (const auto& caseStmt : switchBlock.body())
+            {
+                if (caseStmt.caseExpr())
+                {
+                    if (!checkExpr(*caseStmt.caseExpr(), stateStructName, scopeStack))
+                        return false;
+                }
+                if (caseStmt.body())
+                {
+                    if (!checkCompound(*caseStmt.body(), stateStructName, scopeStack))
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -141,12 +214,14 @@ namespace contractverify
                 return true;
 
             case cppast::CppEntityType::ENTITY_ACCESS_SPECIFIER:
+                // public, protected, private
                 return true;
 
             case cppast::CppEntityType::ENUM:
                 return true;
 
             case cppast::CppEntityType::MACRO_CALL:
+                // macro arguments? but we are anyways restricted to the known macros
                 return true;
 
             case cppast::CppEntityType::GOTO_STATEMENT:
@@ -172,13 +247,16 @@ namespace contractverify
                 return false;
 
             case cppast::CppEntityType::FUNCTION_PTR:
+                std::cout << "function pointer is not allowed!" << std::endl;
                 return false;
 
             case cppast::CppEntityType::THROW_STATEMENT:
+                std::cout << "throw statement is not allowed!" << std::endl;
                 return false;
 
             case cppast::CppEntityType::BLOB:
                 // not quite sure how something becomes a blob but we cannot do the analysis with it
+                std::cout << "CppEntity of type BLOB cannot be analyzed" << std::endl;
                 return false;
 
             case cppast::CppEntityType::COMPOUND:
@@ -231,6 +309,7 @@ namespace contractverify
 
             default:
                 // control should never reach here
+                std::cout << "unknown CppEntity encountered while analyzing the AST: " << (int)entity.entityType() << std::endl;
                 return false;
             }
         }
