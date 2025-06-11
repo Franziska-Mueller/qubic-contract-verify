@@ -229,7 +229,18 @@ namespace contractverify
 
         bool checkVarList(const cppast::CppVarList& varList, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO: Implement this!
+            RETURN_IF_FALSE(checkVar(*varList.firstVar(), stateStructName, scopeStack));
+            auto& varDeclList = varList.varDeclList();
+            for (const auto& decl : varDeclList)
+            {
+                if (decl.ptrLevel_ > 0)
+                {
+                    std::cout << "Pointers are not allowed." << std::endl;
+                    return false;
+                }
+                RETURN_IF_FALSE(checkVarDecl(decl, stateStructName, scopeStack));
+            }
+
             return true;
         }
 
