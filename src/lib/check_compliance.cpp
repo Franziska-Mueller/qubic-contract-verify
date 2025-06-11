@@ -39,6 +39,34 @@ namespace contractverify
                 std::cout << "names starting with double underscores are reserved!" << std::endl;
                 return false;
             }
+            // variadic arguments are not allowed and parsed with a name ending in ...
+            if (name.length() >= 3 && name.compare(name.length() - 3, 3, "...") == 0)
+            {
+                std::cout << "variadic arguments are not allowed!" << std::endl;
+                return false;
+            }
+            return true;
+        }
+
+        bool isTypeAllowed(const std::string& type)
+        {
+            // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+
+            if (type.length() >= 3 && type.compare(type.length() - 3, 3, "...") == 0)
+            {
+                std::cout << "variadic arguments or parameter packs are not allowed!" << std::endl;
+                return false;
+            }
+            std::vector<std::string> forbiddenTypes = { "float", "double", "string", "char", "QpiContext"};
+            for (const auto& forbiddenType : forbiddenTypes)
+            {
+                if (type.find(forbiddenType) != std::string::npos)
+                {
+                    std::cout << "Type " << forbiddenType << " is not allowed." << std::endl;
+                    return false;
+                }
+            }
+
             return true;
         }
 
@@ -60,29 +88,69 @@ namespace contractverify
 
         bool checkVarType(const cppast::CppVarType& varType, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO
+            // if global scope this has to be const or constexpr
+            if (scopeStack.empty())
+            {
+                const auto attr = varType.typeAttr() | (IsConst(varType) ? cppast::CppIdentifierAttrib::CONST : 0);
+                if (!(attr & cppast::CppIdentifierAttrib::CONST || attr & cppast::CppIdentifierAttrib::CONST_EXPR))
+                {
+                    std::cout << "Global variables are not allowed. You may use global constants (const/constexpr)." << std::endl;
+                    return false;
+                }
+            }
+
+            if (varType.compound())
+                RETURN_IF_FALSE(checkEntity(*varType.compound(), stateStructName, scopeStack));
+            else
+                RETURN_IF_FALSE(isTypeAllowed(varType.baseType()));
+
+            if (varType.typeModifier().ptrLevel_ > 0)
+            {
+                std::cout << "Pointers are not allowed." << std::endl;
+                return false;
+            }
+
+            if (varType.parameterPack())
+            {
+                std::cout << "Parameter packs are not allowed." << std::endl;
+                return false;
+            }
+
             return true;
         }
 
-        bool checkVar(const cppast::CppVar& var, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        bool checkVarDecl(const cppast::CppVarDecl& varDecl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO: Implement this!
-            // 
-            // no global variables
-            // 
-            // 1.) allowed if it is a global constant and name starts with name of state struct. State struct is the one that inherits from ContractBase
-            // 2.) also struct members are allowed! entity.owner returns parent compound (STRUCT vs. BLOCK)
+            RETURN_IF_FALSE(isNameAllowed(varDecl.name()));
+            if (scopeStack.empty())
+            {
+                // global constant name has to start with stateStructName
+                if (varDecl.name().compare(0, stateStructName.length(), stateStructName) != 0)
+                {
+                    std::cout << "name of global constant has to start with state struct name" << std::endl;
+                    return false;
+                }
+            }
 
-            // not allowed: pointers, arrays, float/double, strings, chars, variadic/parameter pack, double underscores, QpiContext
-            // scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+            if (!varDecl.arraySizes().empty())
+            {
+                std::cout << "plain arrays are not allowed, use the Array class provided by the QPI instead" << std::endl;
+                return false;
+            }
 
-            // input and output structs only use basic types
-            return true;
-        }
+            if (!varDecl.isInitialized())
+                return true;
 
-        bool checkVarList(const cppast::CppVarList& varList, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
-        {
-            // TODO: Implement this!
+            if (varDecl.initializeType() == cppast::CppVarInitializeType::USING_EQUAL)
+            {
+                RETURN_IF_FALSE(checkExpr(*varDecl.assignValue(), stateStructName, scopeStack));
+            }
+            else if (varDecl.initializeType() == cppast::CppVarInitializeType::DIRECT_CONSTRUCTOR_CALL)
+            {
+                for (const auto& expr : varDecl.constructorCallArgs())
+                    RETURN_IF_FALSE(checkExpr(*expr, stateStructName, scopeStack));
+            }
+
             return true;
         }
 
@@ -137,6 +205,31 @@ namespace contractverify
                     )
                 );
             }
+            return true;
+        }
+
+        bool checkVar(const cppast::CppVar& var, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            // TODO: input and output structs only use basic types
+
+            if (!(scopeStack.empty() || scopeStack.back() == ScopeSpec::STRUCT || scopeStack.back() == ScopeSpec::CLASS))
+            {
+                std::cout << "local variables are not allowed" << std::endl;
+                return false;
+            }
+
+            if (var.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(var.templateSpecification().value(), stateStructName, scopeStack));
+
+            RETURN_IF_FALSE(checkVarType(var.varType(), stateStructName, scopeStack));
+            RETURN_IF_FALSE(checkVarDecl(var.varDecl(), stateStructName, scopeStack));
+
+            return true;
+        }
+
+        bool checkVarList(const cppast::CppVarList& varList, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            // TODO: Implement this!
             return true;
         }
 
