@@ -193,19 +193,75 @@ namespace contractverify
 
         bool checkUsingNamespace(const cppast::CppUsingNamespaceDecl& decl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO: Implement this!
-            // 
-            // global: only allowed if the namespace is QPI
-            // otherwise others are also ok
+            // in global scope, only namespace QPI is allowed
+            if (scopeStack.empty()) // global scope
+            {
+                if (decl.name().compare("QPI") != 0)
+                {
+                    std::cout << "in global scope, only QPI can be used for a using namespace declaration" << std::endl;
+                    return false;
+                }
+            }
+
+            // TODO: check that resolution operator is only used for structs, enums, and namespaces defined in contracts and qpi.h
+
             return true;
         }
 
         bool checkUsingDecl(const cppast::CppUsingDecl& decl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO: Implement this!
-            // 
-            // in functions ok, globally not
+            // in global scope not allowed, otherwise ok
+
+            if (scopeStack.empty()) // global scope
+            {
+                std::cout << "using declaration is not allowed in global scope" << std::endl;
+                return false;
+            }
+
+            if (decl.isTemplated())
+                RETURN_IF_FALSE(checkTemplSpec(decl.templateSpecification().value(), stateStructName, scopeStack));
+
+            // TODO: check that resolution operator is only used for structs, enums, and namespaces defined in contracts and qpi.h
+            // -> is this contained in decl.name() ?
+
+            RETURN_IF_FALSE(
+                std::visit(Overloaded{ 
+                        [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
+                        {
+                            if (varType)
+                            {
+                                return checkVarType(*varType, stateStructName, scopeStack);
+                            }
+                            return true;
+                        },
+                        [&](const std::unique_ptr<cppast::CppFunctionPointer>& funcPtr) -> bool
+                        {
+                            if (funcPtr)
+                            {
+                                std::cout << "function pointer is not allowed!" << std::endl;
+                                return false;
+                            }
+                            return true;
+                        },
+                        [&](const std::unique_ptr<cppast::CppCompound>& compound) -> bool
+                        {
+                            if (compound)
+                            {
+                                return checkCompound(*compound, stateStructName, scopeStack);
+                            }
+                            return true;
+                        } 
+                    },
+                    decl.definition()
+                )
+            );
+
             return true;
+        }
+
+        bool checkGotoStatement(const cppast::CppGotoStatement& gotoStatement, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            return checkExpr(gotoStatement.label(), stateStructName, scopeStack);
         }
 
         bool checkFwdDecl(const cppast::CppForwardClassDecl& fwdDecl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
@@ -392,9 +448,6 @@ namespace contractverify
                 // macro arguments? but we are anyways restricted to the known macros
                 return true;
 
-            case cppast::CppEntityType::GOTO_STATEMENT:
-                return true;
-
             case cppast::CppEntityType::PREPROCESSOR:
                 std::cout << "preprocessor directives are not allowed!" << std::endl;
                 return false;
@@ -438,6 +491,9 @@ namespace contractverify
 
             case cppast::CppEntityType::USING_DECL:
                 return checkUsingDecl((const cppast::CppUsingDecl&)entity, stateStructName, scopeStack);
+
+            case cppast::CppEntityType::GOTO_STATEMENT:
+                return checkGotoStatement((const cppast::CppGotoStatement&)entity, stateStructName, scopeStack);
 
             case cppast::CppEntityType::FORWARD_CLASS_DECL:
                 return checkFwdDecl((const cppast::CppForwardClassDecl&)entity, stateStructName, scopeStack);
