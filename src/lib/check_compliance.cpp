@@ -20,11 +20,25 @@ namespace contractverify
 
         bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
 
-        bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        bool isInheritanceAllowed(const std::string& baseName)
         {
-            // TODO: push onto scope stack
-            return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
-            // TODO: pop from scope stack
+            if (baseName.compare("QpiContext") == 0)
+            {
+                std::cout << "inheritance from type " << baseName << " is not allowed!" << std::endl;
+                return false;
+            }
+            return true;
+        }
+
+        bool isNameAllowed(const std::string& name)
+        {
+            // names starting with double underscores are reserved for internal functions and compiler macros
+            if (name.compare(0, 2, "__"))
+            {
+                std::cout << "names starting with double underscores are reserved!" << std::endl;
+                return false;
+            }
+            return true;
         }
 
         bool checkExpr(const cppast::CppExpression& expression, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
@@ -99,7 +113,7 @@ namespace contractverify
                     );
                 }
 
-                // TODO: check that param.paramName() does not use double underscores
+                RETURN_IF_FALSE(isNameAllowed(param.paramName()));
 
                 RETURN_IF_FALSE(
                     std::visit(Overloaded{ 
@@ -123,6 +137,34 @@ namespace contractverify
                 );
             }
             return true;
+        }
+
+        bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            if (IsNamespaceLike(compound))
+            {
+                if (compound.compoundType() == cppast::CppCompoundType::UNION)
+                {
+                    std::cout << "union is not allowed!" << std::endl;
+                    return false;
+                }
+                if (compound.isTemplated())
+                {
+                    checkTemplSpec(compound.templateSpecification().value(), stateStructName, scopeStack);
+                }
+                RETURN_IF_FALSE(isNameAllowed(compound.name()));
+            }
+            if (!compound.inheritanceList().empty())
+            {
+                for (const auto& inheritanceInfo : compound.inheritanceList())
+                {
+                    RETURN_IF_FALSE(isInheritanceAllowed(inheritanceInfo.baseName));
+                }
+            }
+
+            // TODO: push onto scope stack
+            return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
+            // TODO: pop from scope stack
         }
 
         bool checkUsingNamespace(const cppast::CppUsingNamespaceDecl& decl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
@@ -195,8 +237,7 @@ namespace contractverify
             {
                 for (const auto& memInit : constr.memberInits())
                 {
-                    // TODO:
-                    // check that memInit.memberName does not start with double underscores
+                    RETURN_IF_FALSE(isNameAllowed(memInit.memberName));
                     const std::vector<std::unique_ptr<cppast::CppExpression>>& memberInitArgs = memInit.memberInitInfo.args;
                     for (const auto& arg : memberInitArgs)
                         RETURN_IF_FALSE(checkExpr(*arg, stateStructName, scopeStack));
@@ -228,8 +269,7 @@ namespace contractverify
             if (func.returnType())
                 RETURN_IF_FALSE(checkVarType(*func.returnType(), stateStructName, scopeStack));
 
-            // TODO
-            // check that func.name() does not start with double underscores
+            RETURN_IF_FALSE(isNameAllowed(func.name()));
 
             const auto params = GetAllParams(func);
             if (!params.empty())
