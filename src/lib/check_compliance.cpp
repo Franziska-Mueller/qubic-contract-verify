@@ -14,8 +14,9 @@ namespace contractverify
         enum ScopeSpec
         {
             STRUCT = 0,
-            BLOCK = 1,
+            CLASS = 1,
             NAMESPACE = 2,
+            BLOCK = 3,
         };
 
         bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
@@ -33,7 +34,7 @@ namespace contractverify
         bool isNameAllowed(const std::string& name)
         {
             // names starting with double underscores are reserved for internal functions and compiler macros
-            if (name.compare(0, 2, "__"))
+            if (name.compare(0, 2, "__") == 0)
             {
                 std::cout << "names starting with double underscores are reserved!" << std::endl;
                 return false;
@@ -162,9 +163,32 @@ namespace contractverify
                 }
             }
 
-            // TODO: push onto scope stack
-            return compound.visitAll([&](const cppast::CppEntity& ent) { return checkEntity(ent, stateStructName, scopeStack); });
-            // TODO: pop from scope stack
+            bool scopeStackPushed = true;
+            switch (compound.compoundType())
+            {
+            case cppast::CppCompoundType::STRUCT:
+                scopeStack.push_back(ScopeSpec::STRUCT);
+                break;
+            case cppast::CppCompoundType::CLASS:
+                scopeStack.push_back(ScopeSpec::CLASS);
+                break;
+            case cppast::CppCompoundType::NAMESPACE:
+                scopeStack.push_back(ScopeSpec::NAMESPACE);
+                break;
+            case cppast::CppCompoundType::BLOCK:
+            case cppast::CppCompoundType::EXTERN_C_BLOCK:
+                scopeStack.push_back(ScopeSpec::BLOCK);
+                break;
+            default:
+                scopeStackPushed = false;
+                break;
+            }
+
+            bool checkSucceeded = compound.visitAll([&](const cppast::CppEntity& ent) -> bool { return checkEntity(ent, stateStructName, scopeStack); });
+            if (scopeStackPushed)
+                scopeStack.pop_back();
+
+            return checkSucceeded;
         }
 
         bool checkUsingNamespace(const cppast::CppUsingNamespaceDecl& decl, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
