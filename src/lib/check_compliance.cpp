@@ -34,6 +34,8 @@ namespace contractverify
 
         bool isNameAllowed(const std::string& name)
         {
+            // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+
             // names starting with double underscores are reserved for internal functions and compiler macros
             if (name.compare(0, 2, "__") == 0)
             {
@@ -237,7 +239,8 @@ namespace contractverify
             case cppast::CppBinaryOperator::THREE_WAY_CMP:
             case cppast::CppBinaryOperator::USER_LITERAL:
             case cppast::CppBinaryOperator::DOT:
-                return checkExpr(expr.term1(), stateStructName, scopeStack) && checkExpr(expr.term2(), stateStructName, scopeStack);
+                return checkExpr(expr.term1(), stateStructName, scopeStack)
+                    && checkExpr(expr.term2(), stateStructName, scopeStack);
             case cppast::CppBinaryOperator::DIV:
             case cppast::CppBinaryOperator::DIV_ASSIGN:
                 std::cout << "Division operator `/` is not allowed. Use the function provided in the QPI instead." << std::endl;
@@ -263,25 +266,68 @@ namespace contractverify
             }
         }
 
-        bool checkTrinomialExpr(const cppast::CppTrinomialExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
-        bool checkFuncCallExpr(const cppast::CppFunctionCallExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
-        bool checkUniformInitializerExpr(const cppast::CppUniformInitializerExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
-        bool checkInitializerListExpr(const cppast::CppInitializerListExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
-        bool checkTypecastExpr(const cppast::CppTypecastExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack);
+        bool checkTrinomialExpr(const cppast::CppTrinomialExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            switch (expr.oper())
+            {
+            case cppast::CppTernaryOperator::CONDITIONAL:
+                return checkExpr(expr.term1(), stateStructName, scopeStack) 
+                    && checkExpr(expr.term2(), stateStructName, scopeStack)
+                    && checkExpr(expr.term3(), stateStructName, scopeStack);
+            default:
+                std::cout << "Unknown ternary operator: " << (int)expr.oper() << std::endl;
+                return false;
+            }
+        }
+
+        bool checkFuncCallExpr(const cppast::CppFunctionCallExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            RETURN_IF_FALSE(checkExpr(expr.function(), stateStructName, scopeStack));
+            for (size_t i = 0; i < expr.numArgs(); ++i)
+                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack));
+
+            return true;
+        }
+
+        bool checkUniformInitializerExpr(const cppast::CppUniformInitializerExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            RETURN_IF_FALSE(isNameAllowed(expr.name()));
+            for (size_t i = 0; i < expr.numArgs(); ++i)
+                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack));
+
+            return true;
+        }
+        
+        bool checkInitializerListExpr(const cppast::CppInitializerListExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            for (size_t i = 0; i < expr.numArgs(); ++i)
+                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack));
+
+            return true;
+        }
+
+        bool checkTypecastExpr(const cppast::CppTypecastExpr& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
+        {
+            switch (expr.castType())
+            {
+            case cppast::CppTypecastType::C_STYLE:
+            case cppast::CppTypecastType::FUNCTION_STYLE:
+            case cppast::CppTypecastType::STATIC:
+            case cppast::CppTypecastType::DYNAMIC:
+            case cppast::CppTypecastType::REINTERPRET:
+                return checkVarType(expr.targetType(), stateStructName, scopeStack)
+                    && checkExpr(expr.inputExpresion(), stateStructName, scopeStack);
+            case cppast::CppTypecastType::CONST:
+                std::cout << "`const_cast` is not allowed." << std::endl;
+                return false;
+            default:
+                std::cout << "Unknown cast type: " << (int)expr.castType() << std::endl;
+                return false;
+            }
+        }
 
         bool checkExpr(const cppast::CppExpression& expr, const std::string& stateStructName, std::deque<ScopeSpec>& scopeStack)
         {
-            // TODO: Implement this!
-            // 
-            // forbidden:
-            // - pointers
-            // :: (scope resolution, except for structs, enums, and namespaces defined in contracts and qpi.h)
-            // arrays
-            // float/double
-            // / (div), % (mod)
-            // strings, chars
-            // (?) const_cast -> TypeConverter?
-
             switch (expr.expressionType())
             {
             case cppast::CppExpressionType::ATOMIC:
