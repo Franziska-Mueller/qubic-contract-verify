@@ -6,7 +6,21 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(cppparser REQUIRED)
 
 # Library for contract verification
-add_library(${CONTRACT_VERIFY_LIB} lib/check_compliance.cpp lib/check_compliance.h)
+add_library(${CONTRACT_VERIFY_LIB}
+  lib/defines.h
+  lib/check_compliance.h
+  lib/check_compliance.cpp
+  lib/check_expressions.h
+  lib/check_expressions.cpp
+  lib/check_variables.h
+  lib/check_variables.cpp
+  lib/check_branching_looping.h
+  lib/check_branching_looping.cpp
+  lib/check_names_and_types.h
+  lib/check_names_and_types.cpp
+  lib/check_functionlike.h
+  lib/check_functionlike.cpp
+)
 target_link_libraries(${CONTRACT_VERIFY_LIB} cppparser)
 target_include_directories(${CONTRACT_VERIFY_LIB} 
   INTERFACE

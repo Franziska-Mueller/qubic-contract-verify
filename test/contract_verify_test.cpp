@@ -11,9 +11,9 @@ TEST(ContractVerifyTest, ParsingWorks) {
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
     EXPECT_NE(ast, nullptr);
 
-    // TODO: find a "real" contract example that actually works, QUTIL actually breaks some of the rules, e.g. global constant names
-    //std::string stateStructName = "QUTIL";
-    //// std::string stateStructName = findStateStructName(*ast);
+    // TODO: find a "real" contract example that actually works, QUTIL breaks some of the rules, e.g. global constant names
+    //std::string stateStructName = contractverify::findStateStructName(*ast);
+    //EXPECT_EQ(stateStructName, "QUTIL");
     //EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
 }
 
