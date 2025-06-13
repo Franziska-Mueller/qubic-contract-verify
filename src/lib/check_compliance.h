@@ -8,5 +8,7 @@ namespace contractverify
 
     std::unique_ptr<cppast::CppCompound> parseAST(const std::string& filepath);
 
+    std::string findStateStructName(const cppast::CppCompound& ast);
+
     cppparser::CppParser constructCppParser();
 }

@@ -27,9 +27,7 @@ int main(int argc, char** argv)
     if (!progUnit)
         return 1;
 
-    std::string stateStructName = "QUTIL";
-    // TODO: assumption: state struct is the struct that inherits from ContractBase
-    // std::string stateStructName = findStateStructName(*progUnit);
+    std::string stateStructName = contractverify::findStateStructName(*progUnit);
 
     if (contractverify::checkCompliance(*progUnit, stateStructName))
         return 0;

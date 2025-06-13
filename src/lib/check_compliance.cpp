@@ -873,5 +873,42 @@ namespace contractverify
         return parser.parseFile(filepath.c_str());
     }
 
+    std::string findStateStructName(const cppast::CppCompound& ast)
+    {
+        // Assumption: state struct is the first top-level struct that inherits from ContractBase
+        std::string name = "";
+
+        if (ast.compoundType() != cppast::CppCompoundType::FILE)
+        {
+            std::cout << "Need a top-level compound (compound type FILE) for finding the state struct name." << std::endl;
+            return name;
+        }
+
+        // `visitAll` visits the entities sequentially, so we do not need any lock for `name`
+        ast.visitAll([&](const cppast::CppEntity& entity) -> bool
+            {
+                if (name.empty() && entity.entityType() == cppast::CppEntityType::COMPOUND)
+                {
+                    const auto& compound = (const cppast::CppCompound&)entity;
+                    if (compound.compoundType() == cppast::CppCompoundType::STRUCT)
+                    {
+                        for (const auto& baseClass : compound.inheritanceList())
+                        {
+                            if (baseClass.baseName.compare("ContractBase") == 0)
+                            {
+                                name = compound.name();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                // need to return true in any case because `visitAll` interrupts when the callback returns false on an entity
+                return true;
+            }
+        );
+
+        return name;
+    }
+
 }  // namespace contractverify
 

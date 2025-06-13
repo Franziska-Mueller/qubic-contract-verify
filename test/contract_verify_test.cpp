@@ -21,8 +21,8 @@ TEST(ContractVerifyTest, FailVariadicArgs) {
     std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_variadic_argument.h");
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
 
-    std::string stateStructName = "TESTCON";
-    // std::string stateStructName = findStateStructName(*ast);
+    std::string stateStructName = contractverify::findStateStructName(*ast);
+    EXPECT_EQ(stateStructName, "TESTCON");
 
     EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
 }
@@ -31,8 +31,8 @@ TEST(ContractVerifyTest, FailParameterPack) {
     std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_parameter_pack.h");
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
 
-    std::string stateStructName = "TESTCON";
-    // std::string stateStructName = findStateStructName(*ast);
+    std::string stateStructName = contractverify::findStateStructName(*ast);
+    EXPECT_EQ(stateStructName, "TESTCON");
 
     EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
 }
@@ -41,8 +41,8 @@ TEST(ContractVerifyTest, FailArrayDeclaration) {
     std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_array_declaration.h");
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
 
-    std::string stateStructName = "TESTCON";
-    // std::string stateStructName = findStateStructName(*ast);
+    std::string stateStructName = contractverify::findStateStructName(*ast);
+    EXPECT_EQ(stateStructName, "TESTCON");
 
     EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
 }
@@ -51,8 +51,8 @@ TEST(ContractVerifyTest, FailArrayIndexing) {
     std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_array_indexing.h");
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
 
-    std::string stateStructName = "TESTCON";
-    // std::string stateStructName = findStateStructName(*ast);
+    std::string stateStructName = contractverify::findStateStructName(*ast);
+    EXPECT_EQ(stateStructName, "TESTCON");
 
     EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
 }
