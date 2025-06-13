@@ -10,6 +10,11 @@ TEST(ContractVerifyTest, ParsingWorks) {
     std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_ok.h");
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
     EXPECT_NE(ast, nullptr);
+
+    // TODO: find a "real" contract example that actually works, QUTIL actually breaks some of the rules, e.g. global constant names
+    //std::string stateStructName = "QUTIL";
+    //// std::string stateStructName = findStateStructName(*ast);
+    //EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
 }
 
 TEST(ContractVerifyTest, FailVariadicArgs) {
@@ -24,6 +29,26 @@ TEST(ContractVerifyTest, FailVariadicArgs) {
 
 TEST(ContractVerifyTest, FailParameterPack) {
     std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_parameter_pack.h");
+    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+
+    std::string stateStructName = "TESTCON";
+    // std::string stateStructName = findStateStructName(*ast);
+
+    EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
+}
+
+TEST(ContractVerifyTest, FailArrayDeclaration) {
+    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_array_declaration.h");
+    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+
+    std::string stateStructName = "TESTCON";
+    // std::string stateStructName = findStateStructName(*ast);
+
+    EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
+}
+
+TEST(ContractVerifyTest, FailArrayIndexing) {
+    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_array_indexing.h");
     std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
 
     std::string stateStructName = "TESTCON";

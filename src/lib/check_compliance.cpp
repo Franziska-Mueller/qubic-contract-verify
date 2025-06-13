@@ -505,7 +505,7 @@ namespace contractverify
                 }
             }
 
-            // TODO: check that resolution operator is only used for structs, enums, and namespaces defined in contracts and qpi.h
+            // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
 
             return true;
         }
@@ -523,7 +523,7 @@ namespace contractverify
             if (decl.isTemplated())
                 RETURN_IF_FALSE(checkTemplSpec(decl.templateSpecification().value(), stateStructName, scopeStack));
 
-            // TODO: check that resolution operator is only used for structs, enums, and namespaces defined in contracts and qpi.h
+            // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
             // -> is this contained in decl.name() ?
 
             RETURN_IF_FALSE(
