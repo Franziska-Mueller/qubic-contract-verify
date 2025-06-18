@@ -5,54 +5,53 @@
 #include "check_compliance.h"
 #include "test_files_config.h"
 
+namespace contractverify
+{
+    struct FailureTestInfo
+    {
+        std::string filename;
+        std::string expectedErrorMessage;
+        std::string testName;
+    };
 
-TEST(ContractVerifyTest, ParsingWorks) {
-    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_ok.h");
-    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
-    EXPECT_NE(ast, nullptr);
+    class ContractVerifyFailureTest : public testing::TestWithParam<FailureTestInfo> { };
 
-    // TODO: find a "real" contract example that actually works, QUTIL breaks some of the rules, e.g. global constant names
-    //std::string stateStructName = contractverify::findStateStructName(*ast);
-    //EXPECT_EQ(stateStructName, "QUTIL");
-    //EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
-}
+    TEST(ContractVerifyTest, ParsingWorks) {
+        std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_ok.h");
+        std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+        EXPECT_NE(ast, nullptr);
 
-TEST(ContractVerifyTest, FailVariadicArgs) {
-    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_variadic_argument.h");
-    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+        // TODO: find a "real" contract example that actually works, QUTIL breaks some of the rules, e.g. global constant names
+        //std::string stateStructName = contractverify::findStateStructName(*ast);
+        //EXPECT_EQ(stateStructName, "QUTIL");
+        //EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
+    }
 
-    std::string stateStructName = contractverify::findStateStructName(*ast);
-    EXPECT_EQ(stateStructName, "TESTCON");
+    TEST_P(ContractVerifyFailureTest, FailsWithExpectedError) {
+        const FailureTestInfo& info = GetParam();
+        std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append(info.filename);
+        std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
 
-    EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
-}
+        std::string stateStructName = contractverify::findStateStructName(*ast);
+        EXPECT_EQ(stateStructName, "TESTCON");
 
-TEST(ContractVerifyTest, FailParameterPack) {
-    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_parameter_pack.h");
-    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+        EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
 
-    std::string stateStructName = contractverify::findStateStructName(*ast);
-    EXPECT_EQ(stateStructName, "TESTCON");
+        // TODO: capture std::cout and check that output is equal to expected error message
+    }
 
-    EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
-}
+    FailureTestInfo failureTestInfos[] = {
+        {"test_fail_variadic_argument.h","variadic arguments are not allowed!", "VaridicArguments"},
+        {"test_fail_parameter_pack.h", "", "ParameterPack"},
+        {"test_fail_array_declaration.h", "", "ArrayDeclaration"},
+        {"test_fail_array_indexing.h", "", "ArrayIndexing"},
+    };
 
-TEST(ContractVerifyTest, FailArrayDeclaration) {
-    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_array_declaration.h");
-    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+    INSTANTIATE_TEST_SUITE_P(CVFT,
+        ContractVerifyFailureTest,
+        testing::ValuesIn(failureTestInfos),
+        [](const testing::TestParamInfo<ContractVerifyFailureTest::ParamType>& info)
+        { return info.param.testName; }
+    );
 
-    std::string stateStructName = contractverify::findStateStructName(*ast);
-    EXPECT_EQ(stateStructName, "TESTCON");
-
-    EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
-}
-
-TEST(ContractVerifyTest, FailArrayIndexing) {
-    std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_fail_array_indexing.h");
-    std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
-
-    std::string stateStructName = contractverify::findStateStructName(*ast);
-    EXPECT_EQ(stateStructName, "TESTCON");
-
-    EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), false);
-}
+}  // namespace contractverify
