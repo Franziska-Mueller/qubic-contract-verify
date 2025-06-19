@@ -66,6 +66,8 @@ namespace contractverify
 
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
+        scopeStack.push(ScopeSpec::TEMPL_SPEC);
+
         for (const auto& param : params)
         {
             if (param.paramType().has_value())
@@ -110,6 +112,8 @@ namespace contractverify
                 )
             );
         }
+
+        scopeStack.pop();
         return true;
     }
 

@@ -90,6 +90,18 @@ namespace contractverify
             "test_ok_cstyle_cast.h",
             "CStyleCast"
         },
+        {
+            "test_ok_using_namespace_local.h",
+            "UsingNamespaceLocal"
+        },
+        {
+            "test_ok_forward_declaration.h",
+            "ForwardDeclaration"
+        },
+        {
+            "test_ok_forward_declaration_templated.h",
+            "ForwardDeclarationTemplated"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -187,6 +199,51 @@ namespace contractverify
             "test_fail_const_cast.h",
             "[ ERROR ] `const_cast` is not allowed.\n",
             "ConstCast"
+        },
+        {
+            "test_fail_using_namespace_global.h",
+            "[ ERROR ] Only QPI can be used for a using namespace declaration in global scope.\n",
+            "UsingNamespaceGlobal"
+        },
+        {
+            "test_fail_using_declaration_global.h",
+            "[ ERROR ] Using declaration is not allowed in global scope.\n",
+            "UsingDeclarationGlobal"
+        },
+        {
+            "test_fail_union.h",
+            "[ ERROR ] `union` is not allowed.\n",
+            "Union"
+        },
+        {
+            "test_fail_preprocessor.h",
+            "[ ERROR ] Preprocessor directives (character `#`) are not allowed.\n",
+            "Preprocessor"
+        },
+        {
+            "test_fail_typedef.h",
+            "[ ERROR ] `typedef` is not allowed.\n",
+            "Typedef"
+        },
+        {
+            "test_fail_typedef_list.h",
+            "[ ERROR ] `typedef` is not allowed.\n",
+            "TypedefList"
+        },
+        {
+            "test_fail_namespace_alias.h",
+            "[ ERROR ] Namespace alias is not allowed.\n",
+            "NamespaceAlias"
+        },
+        {
+            "test_fail_function_pointer.h",
+            "[ ERROR ] Function pointers are not allowed.\n",
+            "FunctionPointer"
+        },
+        {
+            "test_fail_throw.h",
+            "[ ERROR ] `throw` statement is not allowed.\n",
+            "Throw"
         },
     };
 

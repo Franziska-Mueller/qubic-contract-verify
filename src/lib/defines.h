@@ -11,6 +11,7 @@ namespace contractverify
         CLASS = 1,
         NAMESPACE = 2,
         BLOCK = 3,
+        TEMPL_SPEC = 4,  // this is needed to distinguish variables in template specs from global variables
     };
 
     // helper struct for visiting variants
