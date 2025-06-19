@@ -62,7 +62,7 @@ namespace contractverify
         {
             "test_fail_variadic_argument.h",
             "[ ERROR ] Variadic arguments are not allowed.\n",
-            "VaridicArguments"
+            "VaridicArgument"
         },
         {
             "test_fail_parameter_pack.h",
@@ -78,6 +78,46 @@ namespace contractverify
             "test_fail_array_indexing.h",
             "[ ERROR ] Plain arrays are not allowed, use the Array class provided by the QPI instead.\n",
             "ArrayIndexing"
+        },
+        {
+            "test_fail_string_literal.h",
+            "[ ERROR ] String literals are not allowed.\n",
+            "StringLiteral"
+        },
+        {
+            "test_fail_char_literal.h",
+            "[ ERROR ] Char literals are not allowed.\n",
+            "CharLiteral"
+        },
+        {
+            "test_fail_pointer_dereferencing.h",
+            "[ ERROR ] Pointer dereferencing (unary operator `*`) is not allowed.\n",
+            "PointerDereferencing"
+        },
+        {
+            "test_fail_variable_referencing.h",
+            "[ ERROR ] Variable referencing (unary operator `&`) is not allowed.\n",
+            "VariableReferencing"
+        },
+        {
+            "test_fail_allocation_new.h",
+            "[ ERROR ] Allocation via `new` is not allowed.\n",
+            "AllocationNew"
+        },
+        {
+            "test_fail_deallocation_delete.h",
+            "[ ERROR ] Deallocation via `delete` is not allowed.\n",
+            "DeallocationDelete"
+        },
+        {
+            "test_fail_deallocation_delete_array.h",
+            "[ ERROR ] Deallocation via `delete` is not allowed.\n",
+            "DeallocationDeleteArray"
+        },
+        {
+            "test_fail_variadic_sizeof.h",
+            "[ ERROR ] Variadic expressions are not allowed.\n",
+            "VariadicSizeof"
         },
     };
 
