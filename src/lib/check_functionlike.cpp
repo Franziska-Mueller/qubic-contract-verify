@@ -27,10 +27,10 @@ namespace contractverify
                     RETURN_IF_FALSE(checkVar(*static_cast<const cppast::CppVar*>(param), stateStructName, scopeStack));
                     break;
                 case cppast::CppEntityType::FUNCTION_PTR:
-                    std::cout << "function pointer is not allowed!" << std::endl;
+                    std::cout << "[ ERROR ] Function pointers are not allowed." << std::endl;
                     return false;
                 default:
-                    std::cout << "unknown CppEntity type in parameter list" << std::endl;
+                    std::cout << "[ ERROR ] Unknown CppEntityType encountered in parameter list." << std::endl;
                     return false;
                 }
             }

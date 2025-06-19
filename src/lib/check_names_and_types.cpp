@@ -17,7 +17,7 @@ namespace contractverify
     {
         if (baseName.compare("QpiContext") == 0)
         {
-            std::cout << "inheritance from type " << baseName << " is not allowed!" << std::endl;
+            std::cout << "[ ERROR ] Inheritance from type " << baseName << " is not allowed." << std::endl;
             return false;
         }
         return true;
@@ -30,13 +30,13 @@ namespace contractverify
         // names starting with double underscores are reserved for internal functions and compiler macros
         if (name.compare(0, 2, "__") == 0)
         {
-            std::cout << "names starting with double underscores are reserved!" << std::endl;
+            std::cout << "[ ERROR ] Names starting with double underscores are reserved." << std::endl;
             return false;
         }
         // variadic arguments are not allowed and parsed with a name ending in ...
         if (name.length() >= 3 && name.compare(name.length() - 3, 3, "...") == 0)
         {
-            std::cout << "variadic arguments are not allowed!" << std::endl;
+            std::cout << "[ ERROR ] Variadic arguments are not allowed." << std::endl;
             return false;
         }
         return true;
@@ -48,7 +48,7 @@ namespace contractverify
 
         if (type.length() >= 3 && type.compare(type.length() - 3, 3, "...") == 0)
         {
-            std::cout << "variadic arguments or parameter packs are not allowed!" << std::endl;
+            std::cout << "[ ERROR ] Variadic arguments or parameter packs are not allowed." << std::endl;
             return false;
         }
         std::vector<std::string> forbiddenTypes = { "float", "double", "string", "char", "QpiContext" };
@@ -56,7 +56,7 @@ namespace contractverify
         {
             if (type.find(forbiddenType) != std::string::npos)
             {
-                std::cout << "Type " << forbiddenType << " is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Type " << forbiddenType << " is not allowed." << std::endl;
                 return false;
             }
         }
@@ -78,7 +78,7 @@ namespace contractverify
                             },
                             [&](const std::unique_ptr<cppast::CppFunctionPointer>& funcPtr) -> bool
                             {
-                                std::cout << "function pointer is not allowed!" << std::endl;
+                                std::cout << "[ ERROR ] Function pointers are not allowed." << std::endl;
                                 return false;
                             }
                         },

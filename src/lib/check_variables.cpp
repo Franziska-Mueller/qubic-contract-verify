@@ -24,14 +24,14 @@ namespace contractverify
                 // global constant name has to start with stateStructName
                 if (varDecl.name().compare(0, stateStructName.length(), stateStructName) != 0)
                 {
-                    std::cout << "name of global constant has to start with state struct name" << std::endl;
+                    std::cout << "[ ERROR ] Name of global constant has to start with state struct name." << std::endl;
                     return false;
                 }
             }
 
             if (!varDecl.arraySizes().empty())
             {
-                std::cout << "Plain arrays are not allowed, use the Array class provided by the QPI instead." << std::endl;
+                std::cout << "[ ERROR ] Plain arrays are not allowed, use the Array class provided by the QPI instead." << std::endl;
                 return false;
             }
 
@@ -61,7 +61,7 @@ namespace contractverify
             const auto attr = varType.typeAttr() | (IsConst(varType) ? cppast::CppIdentifierAttrib::CONST : 0);
             if (!(attr & cppast::CppIdentifierAttrib::CONST || attr & cppast::CppIdentifierAttrib::CONST_EXPR))
             {
-                std::cout << "Global variables are not allowed. You may use global constants (const/constexpr)." << std::endl;
+                std::cout << "[ ERROR ] Global variables are not allowed. You may use global constants (const/constexpr)." << std::endl;
                 return false;
             }
         }
@@ -73,13 +73,13 @@ namespace contractverify
 
         if (varType.typeModifier().ptrLevel_ > 0)
         {
-            std::cout << "Pointers are not allowed." << std::endl;
+            std::cout << "[ ERROR ] Pointers are not allowed." << std::endl;
             return false;
         }
 
         if (varType.parameterPack() || varType.baseType().find("...") != std::string::npos)
         {
-            std::cout << "Parameter packs are not allowed." << std::endl;
+            std::cout << "[ ERROR ] Parameter packs are not allowed." << std::endl;
             return false;
         }
 
@@ -92,7 +92,7 @@ namespace contractverify
 
         if (!(scopeStack.empty() || scopeStack.top() == ScopeSpec::STRUCT || scopeStack.top() == ScopeSpec::CLASS))
         {
-            std::cout << "local variables are not allowed" << std::endl;
+            std::cout << "[ ERROR ] Local variables are not allowed." << std::endl;
             return false;
         }
 
@@ -113,7 +113,7 @@ namespace contractverify
         {
             if (decl.ptrLevel_ > 0)
             {
-                std::cout << "Pointers are not allowed." << std::endl;
+                std::cout << "[ ERROR ] Pointers are not allowed." << std::endl;
                 return false;
             }
             RETURN_IF_FALSE(checkVarDecl(decl, stateStructName, scopeStack));

@@ -20,10 +20,10 @@ namespace contractverify
             switch (expr.atomicExpressionType())
             {
             case cppast::CppAtomicExprType::STRING_LITERAL:
-                std::cout << "String literals are not allowed." << std::endl;
+                std::cout << "[ ERROR ] String literals are not allowed." << std::endl;
                 return false;
             case cppast::CppAtomicExprType::CHAR_LITERAL:
-                std::cout << "Char literals are not allowed." << std::endl;
+                std::cout << "[ ERROR ] Char literals are not allowed." << std::endl;
                 return false;
             case cppast::CppAtomicExprType::NUMBER_LITEREL:
                 return true;
@@ -33,10 +33,10 @@ namespace contractverify
                 return checkVarType((static_cast<const cppast::CppVartypeExpr&>(expr)).value(), stateStructName, scopeStack);
             case cppast::CppAtomicExprType::LAMBDA:
                 // TODO: add checks for lambdas
-                std::cout << "Lambda expressions are not supported yet." << std::endl;
+                std::cout << "[ ERROR ] Lambda expressions are not supported yet." << std::endl;
                 return false;
             default:
-                std::cout << "Unknown atomic expression type: " << (int)expr.atomicExpressionType() << std::endl;
+                std::cout << "[ ERROR ] Unknown atomic expression type: " << (int)expr.atomicExpressionType() << std::endl;
                 return false;
             }
         }
@@ -57,24 +57,24 @@ namespace contractverify
             case cppast::CppUnaryOperator::SIZE_OF:
                 return checkExpr(expr.term(), stateStructName, scopeStack);
             case cppast::CppUnaryOperator::DEREFER:
-                std::cout << "Pointer dereferencing (unary operator `*`) is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Pointer dereferencing (unary operator `*`) is not allowed." << std::endl;
                 return false;
             case cppast::CppUnaryOperator::REFER:
-                std::cout << "Variable referencing (unary operator `&`) is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Variable referencing (unary operator `&`) is not allowed." << std::endl;
                 return false;
             case cppast::CppUnaryOperator::NEW:
-                std::cout << "Allocation via `new` is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Allocation via `new` is not allowed." << std::endl;
                 return false;
             case cppast::CppUnaryOperator::DELETE:
             case cppast::CppUnaryOperator::DELETE_AARAY:
-                std::cout << "Deallocation via `delete` is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Deallocation via `delete` is not allowed." << std::endl;
                 return false;
             case cppast::CppUnaryOperator::VARIADIC:
             case cppast::CppUnaryOperator::VARIADIC_SIZE_OF:
-                std::cout << "Variadic expressions are not allowed." << std::endl;
+                std::cout << "[ ERROR ] Variadic expressions are not allowed." << std::endl;
                 return false;
             default:
-                std::cout << "Unknown unary operator: " << (int)expr.oper() << std::endl;
+                std::cout << "[ ERROR ] Unknown unary operator: " << (int)expr.oper() << std::endl;
                 return false;
             }
         }
@@ -117,25 +117,25 @@ namespace contractverify
                     && checkExpr(expr.term2(), stateStructName, scopeStack);
             case cppast::CppBinaryOperator::DIV:
             case cppast::CppBinaryOperator::DIV_ASSIGN:
-                std::cout << "Division operator `/` is not allowed. Use the function provided in the QPI instead." << std::endl;
+                std::cout << "[ ERROR ] Division operator `/` is not allowed. Use the `div` function provided in the QPI instead." << std::endl;
                 return false;
             case cppast::CppBinaryOperator::PERCENT:
             case cppast::CppBinaryOperator::PERCENT_ASSIGN:
-                std::cout << "Modulo operator `%` is not allowed. Use the function provided in the QPI instead." << std::endl;
+                std::cout << "[ ERROR ] Modulo operator `%` is not allowed. Use the `mod` function provided in the QPI instead." << std::endl;
                 return false;
             case cppast::CppBinaryOperator::ARRAY_INDEX:
-                std::cout << "Plain arrays are not allowed, use the Array class provided by the QPI instead." << std::endl;
+                std::cout << "[ ERROR ] Plain arrays are not allowed, use the Array class provided by the QPI instead." << std::endl;
                 return false;
             case cppast::CppBinaryOperator::PLACEMENT_NEW:
             case cppast::CppBinaryOperator::GLOBAL_PLACEMENT_NEW:
-                std::cout << "Construction via placement `new` is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Construction via placement `new` is not allowed." << std::endl;
                 return false;
             case cppast::CppBinaryOperator::ARROW:
             case cppast::CppBinaryOperator::ARROW_STAR:
-                std::cout << "Dereferencing (operator `->` or `->*`) is not allowed." << std::endl;
+                std::cout << "[ ERROR ] Dereferencing (operator `->` or `->*`) is not allowed." << std::endl;
                 return false;
             default:
-                std::cout << "Unknown binary operator: " << (int)expr.oper() << std::endl;
+                std::cout << "[ ERROR ] Unknown binary operator: " << (int)expr.oper() << std::endl;
                 return false;
             }
         }
@@ -149,7 +149,7 @@ namespace contractverify
                     && checkExpr(expr.term2(), stateStructName, scopeStack)
                     && checkExpr(expr.term3(), stateStructName, scopeStack);
             default:
-                std::cout << "Unknown ternary operator: " << (int)expr.oper() << std::endl;
+                std::cout << "[ ERROR ] Unknown ternary operator: " << (int)expr.oper() << std::endl;
                 return false;
             }
         }
@@ -192,10 +192,10 @@ namespace contractverify
                 return checkVarType(expr.targetType(), stateStructName, scopeStack)
                     && checkExpr(expr.inputExpresion(), stateStructName, scopeStack);
             case cppast::CppTypecastType::CONST:
-                std::cout << "`const_cast` is not allowed." << std::endl;
+                std::cout << "[ ERROR ] `const_cast` is not allowed." << std::endl;
                 return false;
             default:
-                std::cout << "Unknown cast type: " << (int)expr.castType() << std::endl;
+                std::cout << "[ ERROR ] Unknown cast type: " << (int)expr.castType() << std::endl;
                 return false;
             }
         }
@@ -223,7 +223,7 @@ namespace contractverify
         case cppast::CppExpressionType::TYPECAST:
             return checkTypecastExpr(static_cast<const cppast::CppTypecastExpr&>(expr), stateStructName, scopeStack);
         default:
-            std::cout << "Unknown expression type: " << (int)expr.expressionType() << std::endl;
+            std::cout << "[ ERROR ] Unknown expression type: " << (int)expr.expressionType() << std::endl;
             return false;
         }
     }

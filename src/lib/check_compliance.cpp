@@ -26,7 +26,7 @@ namespace contractverify
             {
                 if (decl.name().compare("QPI") != 0)
                 {
-                    std::cout << "in global scope, only QPI can be used for a using namespace declaration" << std::endl;
+                    std::cout << "[ ERROR ] Only QPI can be used for a using namespace declaration in global scope." << std::endl;
                     return false;
                 }
             }
@@ -42,7 +42,7 @@ namespace contractverify
 
             if (scopeStack.empty()) // global scope
             {
-                std::cout << "using declaration is not allowed in global scope" << std::endl;
+                std::cout << "[ ERROR ] Using declaration is not allowed in global scope." << std::endl;
                 return false;
             }
 
@@ -66,7 +66,7 @@ namespace contractverify
                         {
                             if (funcPtr)
                             {
-                                std::cout << "function pointer is not allowed!" << std::endl;
+                                std::cout << "[ ERROR ] Function pointers are not allowed." << std::endl;
                                 return false;
                             }
                             return true;
@@ -102,7 +102,7 @@ namespace contractverify
         {
             if (compound.compoundType() == cppast::CppCompoundType::UNION)
             {
-                std::cout << "union is not allowed!" << std::endl;
+                std::cout << "[ ERROR ] `union` is not allowed." << std::endl;
                 return false;
             }
             if (compound.isTemplated())
@@ -166,32 +166,32 @@ namespace contractverify
             return true;
 
         case cppast::CppEntityType::PREPROCESSOR:
-            std::cout << "preprocessor directives are not allowed!" << std::endl;
+            std::cout << "[ ERROR ] Preprocessor directives (character `#`) are not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::TYPEDEF_DECL:
-            std::cout << "typedef is not allowed!" << std::endl;
+            std::cout << "[ ERROR ] `typedef` is not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::TYPEDEF_DECL_LIST:
-            std::cout << "typedef is not allowed!" << std::endl;
+            std::cout << "[ ERROR ] `typedef` is not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::NAMESPACE_ALIAS:
-            std::cout << "namespace alias is not allowed!" << std::endl;
+            std::cout << "[ ERROR ] Namespace alias is not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::FUNCTION_PTR:
-            std::cout << "function pointer is not allowed!" << std::endl;
+            std::cout << "[ ERROR ] Function pointers are not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::THROW_STATEMENT:
-            std::cout << "throw statement is not allowed!" << std::endl;
+            std::cout << "[ ERROR ] `throw` statement is not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::BLOB:
             // not quite sure how something becomes a blob but we cannot do the analysis with it
-            std::cout << "CppEntity of type BLOB cannot be analyzed" << std::endl;
+            std::cout << "[ ERROR ] CppEntity of type BLOB cannot be analyzed." << std::endl;
             return false;
 
         case cppast::CppEntityType::COMPOUND:
@@ -250,7 +250,7 @@ namespace contractverify
 
         default:
             // control should never reach here
-            std::cout << "unknown CppEntity encountered while analyzing the AST: " << (int)entity.entityType() << std::endl;
+            std::cout << "[ ERROR ] Unknown CppEntityType encountered while analyzing the AST: " << (int)entity.entityType() << std::endl;
             return false;
         }
     }
@@ -294,7 +294,7 @@ namespace contractverify
 
         if (ast.compoundType() != cppast::CppCompoundType::FILE)
         {
-            std::cout << "Need a top-level compound (compound type FILE) for finding the state struct name." << std::endl;
+            std::cout << "[ ERROR ] Need a top-level CppCompound (compound type FILE) for finding the state struct name." << std::endl;
             return name;
         }
 
