@@ -15,6 +15,12 @@ namespace contractverify
         std::string testName;
     };
 
+    struct SuccessTestInfo
+    {
+        std::string filename;
+        std::string testName;
+    };
+
     class ContractVerifyFailureTest : public testing::TestWithParam<FailureTestInfo>
     { 
     protected:
@@ -35,6 +41,8 @@ namespace contractverify
         }        
     };
 
+    class ContractVerifySuccessTest : public testing::TestWithParam<SuccessTestInfo> {};
+
     TEST(ContractVerifyTest, ParsingWorks) {
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_ok.h");
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
@@ -44,6 +52,17 @@ namespace contractverify
         //std::string stateStructName = contractverify::findStateStructName(*ast);
         //EXPECT_EQ(stateStructName, "QUTIL");
         //EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
+    }
+
+    TEST_P(ContractVerifySuccessTest, PassesComplianceCheck) {
+        const SuccessTestInfo& info = GetParam();
+        std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append(info.filename);
+        std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+
+        std::string stateStructName = contractverify::findStateStructName(*ast);
+        EXPECT_EQ(stateStructName, "TESTCON");
+
+        EXPECT_TRUE(contractverify::checkCompliance(*ast, stateStructName));
     }
 
     TEST_P(ContractVerifyFailureTest, FailsWithExpectedError) {
@@ -57,6 +76,21 @@ namespace contractverify
         EXPECT_FALSE(contractverify::checkCompliance(*ast, stateStructName));
         EXPECT_THAT(customBuffer.str(), testing::StrEq(info.expectedErrorMessage));
     }
+
+    SuccessTestInfo successTestInfos[] = {
+        {
+            "test_ok_function_call.h",
+            "FunctionCall"
+        },
+        {
+            "test_ok_initializer_list.h",
+            "InitializerList"
+        },
+        {
+            "test_ok_cstyle_cast.h",
+            "CStyleCast"
+        },
+    };
 
     FailureTestInfo failureTestInfos[] = {
         {
@@ -149,7 +183,19 @@ namespace contractverify
             "[ ERROR ] Dereferencing (operator `->` or `->*`) is not allowed.\n",
             "DereferencingArrowStar"
         },
+        {
+            "test_fail_const_cast.h",
+            "[ ERROR ] `const_cast` is not allowed.\n",
+            "ConstCast"
+        },
     };
+
+    INSTANTIATE_TEST_SUITE_P(CVST,
+        ContractVerifySuccessTest,
+        testing::ValuesIn(successTestInfos),
+        [](const testing::TestParamInfo<ContractVerifySuccessTest::ParamType>& info)
+        { return info.param.testName; }
+    );
 
     INSTANTIATE_TEST_SUITE_P(CVFT,
         ContractVerifyFailureTest,
