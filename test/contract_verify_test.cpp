@@ -70,6 +70,11 @@ namespace contractverify
             "ParameterPack"
         },
         {
+            "test_fail_variadic_sizeof.h",
+            "[ ERROR ] Variadic expressions are not allowed.\n",
+            "VariadicSizeof"
+        },
+        {
             "test_fail_array_declaration.h",
             "[ ERROR ] Plain arrays are not allowed, use the Array class provided by the QPI instead.\n",
             "ArrayDeclaration"
@@ -115,9 +120,34 @@ namespace contractverify
             "DeallocationDeleteArray"
         },
         {
-            "test_fail_variadic_sizeof.h",
-            "[ ERROR ] Variadic expressions are not allowed.\n",
-            "VariadicSizeof"
+            "test_fail_div.h",
+            "[ ERROR ] Division operator `/` is not allowed. Use the `div` function provided in the QPI instead.\n",
+            "Division"
+        },
+        {
+            "test_fail_div_assign.h",
+            "[ ERROR ] Division operator `/` is not allowed. Use the `div` function provided in the QPI instead.\n",
+            "DivisionAssign"
+        },
+        {
+            "test_fail_mod.h",
+            "[ ERROR ] Modulo operator `%` is not allowed. Use the `mod` function provided in the QPI instead.\n",
+            "Modulo"
+        },
+        {
+            "test_fail_mod_assign.h",
+            "[ ERROR ] Modulo operator `%` is not allowed. Use the `mod` function provided in the QPI instead.\n",
+            "ModuloAssign"
+        },
+        {
+            "test_fail_dereferencing_arrow.h",
+            "[ ERROR ] Dereferencing (operator `->` or `->*`) is not allowed.\n",
+            "DereferencingArrow"
+        },
+        {
+            "test_fail_dereferencing_arrow_star.h",
+            "[ ERROR ] Dereferencing (operator `->` or `->*`) is not allowed.\n",
+            "DereferencingArrowStar"
         },
     };
 
