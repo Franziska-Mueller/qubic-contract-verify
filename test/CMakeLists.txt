@@ -29,6 +29,7 @@ add_executable(
 target_link_libraries(
   ${TEST_EXE}
   GTest::gtest_main
+  GTest::gmock_main
   ${CONTRACT_VERIFY_LIB}
 )
 target_include_directories(
