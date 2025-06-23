@@ -8,6 +8,7 @@
 
 #include "check_compliance.h"
 #include "check_expressions.h"
+#include "check_variables.h"
 #include "defines.h"
 
 
@@ -34,6 +35,18 @@ namespace contractverify
             RETURN_IF_FALSE(checkExpr(*forBlock.stop(), stateStructName, scopeStack));
         if (forBlock.step())
             RETURN_IF_FALSE(checkExpr(*forBlock.step(), stateStructName, scopeStack));
+        if (forBlock.body())
+            RETURN_IF_FALSE(checkEntity(*forBlock.body(), stateStructName, scopeStack));
+
+        return true;
+    }
+
+    bool checkRangeForBlock(const cppast::CppRangeForBlock& forBlock, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    {
+        if (forBlock.var())
+            RETURN_IF_FALSE(checkVar(*forBlock.var(), stateStructName, scopeStack));
+        if (forBlock.expr())
+            RETURN_IF_FALSE(checkExpr(*forBlock.expr(), stateStructName, scopeStack));
         if (forBlock.body())
             RETURN_IF_FALSE(checkEntity(*forBlock.body(), stateStructName, scopeStack));
 

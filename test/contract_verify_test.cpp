@@ -102,6 +102,30 @@ namespace contractverify
             "test_ok_forward_declaration_templated.h",
             "ForwardDeclarationTemplated"
         },
+        {
+            "test_ok_if_block.h",
+            "IfBlock"
+        },
+        {
+            "test_ok_for_block.h",
+            "ForBlock"
+        },
+        {
+            "test_ok_while_block.h",
+            "WhileBlock"
+        },
+        {
+            "test_ok_do_while_block.h",
+            "DoWhileBlock"
+        },
+        {
+            "test_ok_switch_block.h",
+            "SwitchBlock"
+        },
+        {
+            "test_ok_goto.h",
+            "Goto"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {

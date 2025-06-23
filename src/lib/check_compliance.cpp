@@ -165,6 +165,9 @@ namespace contractverify
             // macro arguments? but we are anyways restricted to the known macros
             return true;
 
+        case cppast::CppEntityType::LABEL:
+            return true;
+
         case cppast::CppEntityType::PREPROCESSOR:
             std::cout << "[ ERROR ] Preprocessor directives (character `#`) are not allowed." << std::endl;
             return false;
@@ -187,6 +190,10 @@ namespace contractverify
 
         case cppast::CppEntityType::THROW_STATEMENT:
             std::cout << "[ ERROR ] `throw` statement is not allowed." << std::endl;
+            return false;
+
+        case cppast::CppEntityType::TRY_BLOCK:
+            std::cout << "[ ERROR ] `try` blocks are not allowed." << std::endl;
             return false;
 
         case cppast::CppEntityType::BLOB:
@@ -238,6 +245,9 @@ namespace contractverify
 
         case cppast::CppEntityType::FOR_BLOCK:
             return checkForBlock((const cppast::CppForBlock&)entity, stateStructName, scopeStack);
+
+        case cppast::CppEntityType::RANGE_FOR_BLOCK:
+            return checkRangeForBlock((const cppast::CppRangeForBlock&)entity, stateStructName, scopeStack);
 
         case cppast::CppEntityType::WHILE_BLOCK:
             return checkWhileBlock((const cppast::CppWhileBlock&)entity, stateStructName, scopeStack);
