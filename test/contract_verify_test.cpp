@@ -126,6 +126,11 @@ namespace contractverify
             "test_ok_goto.h",
             "Goto"
         },
+        {
+            "test_ok_constructor_destructor.h",
+            "ConstructorDestructor"
+        },
+
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -136,7 +141,7 @@ namespace contractverify
         },
         {
             "test_fail_parameter_pack.h",
-            "[ ERROR ] Parameter packs are not allowed.\n",
+            "[ ERROR ] Variadic arguments or parameter packs are not allowed.\n",
             "ParameterPack"
         },
         {
@@ -268,6 +273,46 @@ namespace contractverify
             "test_fail_throw.h",
             "[ ERROR ] `throw` statement is not allowed.\n",
             "Throw"
+        },
+        {
+            "test_fail_inheritance.h",
+            "[ ERROR ] Inheritance from type QpiContext is not allowed.\n",
+            "Inheritance"
+        },
+        {
+            "test_fail_name_compound.h",
+            "[ ERROR ] Names starting with double underscores are reserved.\n",
+            "NameCompound"
+        },
+        {
+            "test_fail_name_function.h",
+            "[ ERROR ] Names starting with double underscores are reserved.\n",
+            "NameFunction"
+        },
+        {
+            "test_fail_name_param.h",
+            "[ ERROR ] Names starting with double underscores are reserved.\n",
+            "NameParam"
+        },
+        {
+            "test_fail_name_var.h",
+            "[ ERROR ] Names starting with double underscores are reserved.\n",
+            "NameVar"
+        },
+        {
+            "test_fail_type_float.h",
+            "[ ERROR ] Type float is not allowed.\n",
+            "TypeFloat"
+        },
+        {
+            "test_fail_type_double.h",
+            "[ ERROR ] Type double is not allowed.\n",
+            "TypeDouble"
+        },
+        {
+            "test_fail_type_char.h",
+            "[ ERROR ] Type char is not allowed.\n",
+            "TypeChar"
         },
     };
 

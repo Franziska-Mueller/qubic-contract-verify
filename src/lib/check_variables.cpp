@@ -67,9 +67,9 @@ namespace contractverify
         }
 
         if (varType.compound())
-            RETURN_IF_FALSE(checkEntity(*varType.compound(), stateStructName, scopeStack));
+            RETURN_IF_FALSE(checkEntity(*varType.compound(), stateStructName, scopeStack))
         else
-            RETURN_IF_FALSE(isTypeAllowed(varType.baseType()));
+            RETURN_IF_FALSE(isTypeAllowed(varType.baseType()))
 
         if (varType.typeModifier().ptrLevel_ > 0)
         {

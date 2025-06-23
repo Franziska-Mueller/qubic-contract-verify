@@ -1,6 +1,6 @@
 #pragma once
 
-#define RETURN_IF_FALSE(x) if(!x) return false
+#define RETURN_IF_FALSE(x) { if(!x) return false; } // wrapped in braces to make it work correctly when used inside an `if` block that is followed by `else`
 
 
 namespace contractverify
