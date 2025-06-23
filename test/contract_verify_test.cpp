@@ -130,6 +130,10 @@ namespace contractverify
             "test_ok_constructor_destructor.h",
             "ConstructorDestructor"
         },
+        {
+            "test_ok_global_constant.h",
+            "GlobalConstant"
+        },
 
     };
 
@@ -313,6 +317,26 @@ namespace contractverify
             "test_fail_type_char.h",
             "[ ERROR ] Type char is not allowed.\n",
             "TypeChar"
+        },
+        {
+            "test_fail_global_constant.h",
+            "[ ERROR ] Name of global constant has to start with state struct name.\n",
+            "GlobalConstant"
+        },
+        {
+            "test_fail_global_variable.h",
+            "[ ERROR ] Global variables are not allowed. You may use global constants (const/constexpr).\n",
+            "GlobalVariable"
+        },
+        {
+            "test_fail_pointer_declaration.h",
+            "[ ERROR ] Pointers are not allowed.\n",
+            "PointerDeclaration"
+        },
+        {
+            "test_fail_local_variable.h",
+            "[ ERROR ] Local variables are not allowed.\n",
+            "LocalVariable"
         },
     };
 
