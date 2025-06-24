@@ -18,6 +18,6 @@ On linux, you can then build via `make`. On Windows, you can build the solution 
 # How to run
 
 Navigate to your `build/src/<CONFIGURATION>` directory where `CONFIGURATION` is `Debug` or `Release`.
-Run the tool on you contract file:
+Run the tool on your contract file:
 
-`./main.exe <FILEPATH>`
+`./contractverify <FILEPATH>`
