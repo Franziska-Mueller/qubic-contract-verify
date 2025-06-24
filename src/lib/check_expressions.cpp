@@ -6,6 +6,7 @@
 
 #include <cppparser/cppparser.h>
 
+#include "check_functionlike.h"
 #include "check_names_and_types.h"
 #include "check_variables.h"
 #include "defines.h"
@@ -15,6 +16,7 @@ namespace contractverify
 {
     namespace
     {
+
         bool checkAtomicExpr(const cppast::CppAtomicExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
         {
             switch (expr.atomicExpressionType())
@@ -32,9 +34,7 @@ namespace contractverify
             case cppast::CppAtomicExprType::VARTYPE:
                 return checkVarType((static_cast<const cppast::CppVartypeExpr&>(expr)).value(), stateStructName, scopeStack);
             case cppast::CppAtomicExprType::LAMBDA:
-                // TODO: add checks for lambdas
-                std::cout << "[ ERROR ] Lambda expressions are not supported yet." << std::endl;
-                return false;
+                return checkLambda((static_cast<const cppast::CppLambdaExpr&>(expr)).lamda(), stateStructName, scopeStack);
             default:
                 std::cout << "[ ERROR ] Unknown atomic expression type: " << (int)expr.atomicExpressionType() << std::endl;
                 return false;

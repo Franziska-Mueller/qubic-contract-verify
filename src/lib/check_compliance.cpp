@@ -234,6 +234,9 @@ namespace contractverify
         case cppast::CppEntityType::FUNCTION:
             return checkFunction((const cppast::CppFunction&)entity, stateStructName, scopeStack);
 
+        case cppast::CppEntityType::LAMBDA:
+            return checkLambda((const cppast::CppLambda&)entity, stateStructName, scopeStack);
+
         case cppast::CppEntityType::EXPRESSION:
             return checkExpr((const cppast::CppExpression&)entity, stateStructName, scopeStack);
 

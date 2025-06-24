@@ -19,4 +19,6 @@ namespace contractverify
     bool checkFunction(const cppast::CppFunction& func, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
 
     bool checkReturn(const cppast::CppReturnStatement& returnStatement, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
+
+    bool checkLambda(const cppast::CppLambda& lambda, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
 }

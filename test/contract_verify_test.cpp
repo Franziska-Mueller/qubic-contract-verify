@@ -134,7 +134,18 @@ namespace contractverify
             "test_ok_global_constant.h",
             "GlobalConstant"
         },
-
+        {
+            "test_ok_lambda.h",
+            "Lambda"
+        },
+        {
+            "test_ok_function.h",
+            "Function"
+        },
+        {
+            "test_ok_function_templated.h",
+            "FunctionTemplated"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {

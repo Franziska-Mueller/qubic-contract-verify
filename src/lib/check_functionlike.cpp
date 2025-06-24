@@ -1,6 +1,7 @@
 #include "check_functionlike.h"
 
 #include <iostream>
+#include <ranges>
 #include <stack>
 #include <string>
 
@@ -54,6 +55,8 @@ namespace contractverify
 
     bool checkConstructor(const cppast::CppConstructor& constr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
+        scopeStack.push(ScopeSpec::FUNC_SIG);
+
         if (constr.isTemplated())
             RETURN_IF_FALSE(checkTemplSpec(constr.templateSpecification().value(), stateStructName, scopeStack));
 
@@ -75,6 +78,7 @@ namespace contractverify
         if (constr.defn())
             RETURN_IF_FALSE(checkCompound(*constr.defn(), stateStructName, scopeStack));
 
+        scopeStack.pop();
         return true;
     }
 
@@ -91,6 +95,8 @@ namespace contractverify
 
     bool checkFunction(const cppast::CppFunction& func, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
+        scopeStack.push(ScopeSpec::FUNC_SIG);
+
         if (func.isTemplated())
             RETURN_IF_FALSE(checkTemplSpec(func.templateSpecification().value(), stateStructName, scopeStack));
 
@@ -106,6 +112,7 @@ namespace contractverify
         if (func.defn())
             RETURN_IF_FALSE(checkCompound(*func.defn(), stateStructName, scopeStack));
 
+        scopeStack.pop();
         return true;
     }
 
@@ -113,6 +120,33 @@ namespace contractverify
     {
         if (returnStatement.hasReturnValue())
             RETURN_IF_FALSE(checkExpr(returnStatement.returnValue(), stateStructName, scopeStack));
+        return true;
+    }
+
+    bool checkLambda(const cppast::CppLambda& lambda, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    {
+        scopeStack.push(ScopeSpec::FUNC_SIG);
+
+        if (lambda.captures())
+            RETURN_IF_FALSE(checkExpr(*lambda.captures(), stateStructName, scopeStack));
+
+        if (lambda.returnType())
+            RETURN_IF_FALSE(checkVarType(*lambda.returnType(), stateStructName, scopeStack));
+
+        const std::vector<std::unique_ptr<cppast::CppEntity>>& params = lambda.params();
+        if (!params.empty())
+        {
+            auto getPtr = [](const std::unique_ptr<cppast::CppEntity>& uptr) -> const cppast::CppEntity*
+                { return uptr.get(); };
+            auto paramPtrs = params | std::views::transform(getPtr);
+            // update this with std::ranges::to<std::vector> once we use C++23
+            RETURN_IF_FALSE(checkParamList(std::vector<const cppast::CppEntity*>(paramPtrs.begin(), paramPtrs.end()), stateStructName, scopeStack));
+        }
+
+        if (lambda.defn())
+            RETURN_IF_FALSE(checkCompound(*lambda.defn(), stateStructName, scopeStack));
+
+        scopeStack.pop();
         return true;
     }
 
