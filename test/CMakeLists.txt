@@ -39,4 +39,4 @@ target_include_directories(
 )
 
 include(GoogleTest)
-gtest_discover_tests(test)
+gtest_discover_tests(${TEST_EXE})
