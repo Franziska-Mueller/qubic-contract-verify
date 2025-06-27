@@ -266,9 +266,14 @@ namespace contractverify
             "Union"
         },
         {
-            "test_fail_preprocessor.h",
+            "test_fail_preprocessor_include.h",
             "[ ERROR ] Preprocessor directives (character `#`) are not allowed.\n",
-            "Preprocessor"
+            "PreprocessorInclude"
+        },
+        {
+            "test_fail_preprocessor_define.h",
+            "[ ERROR ] Preprocessor directives (character `#`) are not allowed.\n",
+            "PreprocessorDefine"
         },
         {
             "test_fail_typedef.h",
