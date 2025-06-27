@@ -18,6 +18,8 @@ namespace contractverify
 
     bool hasStateStructPrefix(const std::string& name, const std::string& stateStructName);
 
+    bool isScopeResolutionAllowed(const std::string& name);
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
 
     bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);

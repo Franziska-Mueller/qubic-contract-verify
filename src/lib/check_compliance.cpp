@@ -278,29 +278,10 @@ namespace contractverify
         return checkEntity(compound, stateStructName, scopeStack);
     }
 
-    cppparser::CppParser constructCppParser()
-    {
-        cppparser::CppParser parser;
-        parser.addKnownMacros({
-            "PUBLIC_FUNCTION",
-            "PUBLIC_FUNCTION_WITH_LOCALS",
-            "PUBLIC_PROCEDURE",
-            "PUBLIC_PROCEDURE_WITH_LOCALS",
-            "END_TICK",
-            "END_TICK_WITH_LOCALS",
-            "BEGIN_TICK",
-            "BEGIN_TICK_WITH_LOCALS",
-            "REGISTER_USER_FUNCTIONS_AND_PROCEDURES",
-            "REGISTER_USER_FUNCTION",
-            "REGISTER_USER_PROCEDURE",
-            });
-
-        return parser;
-    }
-
     std::unique_ptr<cppast::CppCompound> parseAST(const std::string& filepath)
     {
-        cppparser::CppParser parser = constructCppParser();
+        cppparser::CppParser parser;
+        parser.addKnownMacros(knownMacroNames);
         return parser.parseFile(filepath.c_str());
     }
 

@@ -20,4 +20,45 @@ namespace contractverify
     // refer to https://en.cppreference.com/w/cpp/utility/variant/visit2 for details
     template <class... Ts>
     struct Overloaded : Ts... { using Ts::operator()...; };
+
+    static const std::vector<std::string> knownMacroNames = {
+            "PUBLIC_FUNCTION",
+            "PUBLIC_FUNCTION_WITH_LOCALS",
+            "PUBLIC_PROCEDURE",
+            "PUBLIC_PROCEDURE_WITH_LOCALS",
+            "END_TICK",
+            "END_TICK_WITH_LOCALS",
+            "BEGIN_TICK",
+            "BEGIN_TICK_WITH_LOCALS",
+            "BEGIN_EPOCH",
+            "BEGIN_EPOCH_WITH_LOCALS",
+            "END_EPOCH",
+            "END_EPOCH_WITH_LOCALS",
+            "REGISTER_USER_FUNCTIONS_AND_PROCEDURES",
+            "REGISTER_USER_FUNCTION",
+            "REGISTER_USER_PROCEDURE",
+    };
+
+    static const std::vector<std::string> allowedScopePrefixes = {
+        // QPI and names defined in qpi.h
+        "QPI",
+        "ProposalTypes",
+        "TransferType",
+        "AssetIssuanceSelect",
+        "AssetOwnershipSelect",
+        "AssetPossessionSelect",
+        // other contract names
+        "QUOTTERY",
+        "QX",
+        "TESTEXA",
+        "TESTEXB",
+        // the following names are defined and used in the same contract file
+        // -> TODO: add structs/enums from same file to whitelist before checking compliance
+        "QBAYLogInfo",
+        "QuotteryLogInfo",
+        "AssetAskOrders_output",
+        "AssetBidOrders_output",
+        "EntityAskOrders_output",
+        "EntityBidOrders_output",
+    };
 }

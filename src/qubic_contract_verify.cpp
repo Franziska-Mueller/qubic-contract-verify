@@ -8,8 +8,6 @@
 
 int main(int argc, char** argv)
 {
-    cppparser::CppParser parser = contractverify::constructCppParser();
-
     if (argc < 2) 
     {
         std::cerr << "Mandatory filepath argument was not provided" << std::endl
@@ -22,14 +20,14 @@ int main(int argc, char** argv)
     }
     auto filepath = std::string(argv[1]);
 
-    std::unique_ptr<cppast::CppCompound> progUnit = parser.parseFile(filepath.c_str());
+    std::unique_ptr<cppast::CppCompound> contractAST = contractverify::parseAST(filepath);
 
-    if (!progUnit)
+    if (!contractAST)
         return 1;
 
-    std::string stateStructName = contractverify::findStateStructName(*progUnit);
+    std::string stateStructName = contractverify::findStateStructName(*contractAST);
 
-    if (contractverify::checkCompliance(*progUnit, stateStructName))
+    if (contractverify::checkCompliance(*contractAST, stateStructName))
         return 0;
     else
         return 1;

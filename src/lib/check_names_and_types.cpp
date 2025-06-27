@@ -75,6 +75,15 @@ namespace contractverify
         return true;
     }
 
+    bool isScopeResolutionAllowed(const std::string& name)
+    {
+        if (name.find("::") != std::string::npos)
+        {
+            // TODO
+        }
+        return true;
+    }
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
         scopeStack.push(ScopeSpec::TEMPL_SPEC);
