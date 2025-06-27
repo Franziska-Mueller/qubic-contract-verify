@@ -176,14 +176,6 @@ namespace contractverify
             std::cout << "[ ERROR ] Preprocessor directives (character `#`) are not allowed." << std::endl;
             return false;
 
-        case cppast::CppEntityType::TYPEDEF_DECL:
-            std::cout << "[ ERROR ] `typedef` is not allowed." << std::endl;
-            return false;
-
-        case cppast::CppEntityType::TYPEDEF_DECL_LIST:
-            std::cout << "[ ERROR ] `typedef` is not allowed." << std::endl;
-            return false;
-
         case cppast::CppEntityType::NAMESPACE_ALIAS:
             std::cout << "[ ERROR ] Namespace alias is not allowed." << std::endl;
             return false;
@@ -227,6 +219,12 @@ namespace contractverify
 
         case cppast::CppEntityType::USING_DECL:
             return checkUsingDecl((const cppast::CppUsingDecl&)entity, stateStructName, scopeStack);
+
+        case cppast::CppEntityType::TYPEDEF_DECL:
+            return checkTypedef((const cppast::CppTypedefName&)entity, stateStructName, scopeStack);
+
+        case cppast::CppEntityType::TYPEDEF_DECL_LIST:
+            return checkTypedefList((const cppast::CppTypedefList&)entity, stateStructName, scopeStack);
 
         case cppast::CppEntityType::GOTO_STATEMENT:
             return checkGotoStatement((const cppast::CppGotoStatement&)entity, stateStructName, scopeStack);

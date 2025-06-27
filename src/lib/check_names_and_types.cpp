@@ -128,4 +128,34 @@ namespace contractverify
         return true;
     }
 
+    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    {
+        if (scopeStack.empty())
+        {
+            std::cout << "[ ERROR ] `typedef` is not allowed in global scope." << std::endl;
+            return false;
+        }
+
+        scopeStack.push(ScopeSpec::TYPEDEF);
+        RETURN_IF_FALSE(checkVar(*def.var(), stateStructName, scopeStack));
+        scopeStack.pop();
+
+        return true;
+    }
+
+    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    {
+        if (scopeStack.empty())
+        {
+            std::cout << "[ ERROR ] `typedef` is not allowed in global scope." << std::endl;
+            return false;
+        }
+
+        scopeStack.push(ScopeSpec::TYPEDEF);
+        RETURN_IF_FALSE(checkVarList(defList.varList(), stateStructName, scopeStack));
+        scopeStack.pop();
+
+        return true;
+    }
+
 }  // namespace contractverify

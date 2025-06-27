@@ -142,6 +142,10 @@ namespace contractverify
             "test_ok_function_templated.h",
             "FunctionTemplated"
         },
+        {
+            "test_ok_typedef_local.h",
+            "TypedefLocal"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -276,14 +280,24 @@ namespace contractverify
             "PreprocessorDefine"
         },
         {
-            "test_fail_typedef.h",
-            "[ ERROR ] `typedef` is not allowed.\n",
-            "Typedef"
+            "test_fail_typedef_global.h",
+            "[ ERROR ] `typedef` is not allowed in global scope.\n",
+            "TypedefGlobal"
         },
         {
-            "test_fail_typedef_list.h",
-            "[ ERROR ] `typedef` is not allowed.\n",
-            "TypedefList"
+            "test_fail_typedef_list_global.h",
+            "[ ERROR ] `typedef` is not allowed in global scope.\n",
+            "TypedefListGlobal"
+        },
+        {
+            "test_fail_typedef_forbidden_type.h",
+            "[ ERROR ] Pointers are not allowed.\n",
+            "TypedefForbiddenType"
+        },
+        {
+            "test_fail_typedef_list_forbidden_type.h",
+            "[ ERROR ] Pointers are not allowed.\n",
+            "TypedefListForbiddenType"
         },
         {
             "test_fail_namespace_alias.h",

@@ -19,4 +19,8 @@ namespace contractverify
     bool hasStateStructPrefix(const std::string& name, const std::string& stateStructName);
 
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
+
+    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
+
+    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
 }

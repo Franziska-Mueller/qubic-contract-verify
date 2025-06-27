@@ -83,7 +83,8 @@ namespace contractverify
     {
         // TODO: input and output structs only use basic types
 
-        if (!(scopeStack.empty() || scopeStack.top() == ScopeSpec::STRUCT || scopeStack.top() == ScopeSpec::CLASS || scopeStack.top() == ScopeSpec::FUNC_SIG))
+        if (!(scopeStack.empty() || scopeStack.top() == ScopeSpec::STRUCT || scopeStack.top() == ScopeSpec::CLASS 
+            || scopeStack.top() == ScopeSpec::FUNC_SIG || scopeStack.top() == ScopeSpec::TYPEDEF))
         {
             std::cout << "[ ERROR ] Local variables are not allowed." << std::endl;
             return false;
