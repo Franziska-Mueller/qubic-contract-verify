@@ -123,9 +123,13 @@ namespace contractverify
         switch (compound.compoundType())
         {
         case cppast::CppCompoundType::STRUCT:
+            if (scopeStack.empty()) // global struct name has to start with stateStructName  
+                RETURN_IF_FALSE(hasStateStructPrefix(compound.name(), stateStructName));
             scopeStack.push(ScopeSpec::STRUCT);
             break;
         case cppast::CppCompoundType::CLASS:
+            if (scopeStack.empty()) // global class name has to start with stateStructName
+                RETURN_IF_FALSE(hasStateStructPrefix(compound.name(), stateStructName));
             scopeStack.push(ScopeSpec::CLASS);
             break;
         case cppast::CppCompoundType::NAMESPACE:

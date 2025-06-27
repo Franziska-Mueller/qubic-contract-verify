@@ -19,15 +19,8 @@ namespace contractverify
         bool checkVarDecl(const cppast::CppVarDecl& varDecl, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
         {
             RETURN_IF_FALSE(isNameAllowed(varDecl.name()));
-            if (scopeStack.empty())
-            {
-                // global constant name has to start with stateStructName
-                if (varDecl.name().compare(0, stateStructName.length(), stateStructName) != 0)
-                {
-                    std::cout << "[ ERROR ] Name of global constant has to start with state struct name." << std::endl;
-                    return false;
-                }
-            }
+            if (scopeStack.empty()) // global constant name has to start with stateStructName
+                RETURN_IF_FALSE(hasStateStructPrefix(varDecl.name(), stateStructName));
 
             if (!varDecl.arraySizes().empty())
             {

@@ -64,6 +64,17 @@ namespace contractverify
         return true;
     }
 
+    bool hasStateStructPrefix(const std::string& name, const std::string& stateStructName)
+    {
+        if (name.compare(0, stateStructName.length(), stateStructName) != 0)
+        {
+            std::cout << "[ ERROR ] Names declared in global scope (constants, structs/classes, functions) have to start with state struct name ("
+                << stateStructName << "). Found invalid name: " << name << std::endl;
+            return false;
+        }
+        return true;
+    }
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
         scopeStack.push(ScopeSpec::TEMPL_SPEC);

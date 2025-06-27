@@ -1,6 +1,6 @@
 using namespace QPI;
 
-int dummyFunc(int x)
+int TESTCON_dummyFunc(int x)
 {
     return x + 1;
 }

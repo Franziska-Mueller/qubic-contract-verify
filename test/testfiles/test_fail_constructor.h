@@ -1,8 +1,9 @@
 using namespace QPI;
 
-struct TESTCON : public ContractBase {};
-
-class HelperClass
+struct TESTCON : public ContractBase
 {
-    HelperClass() {}
+    class HelperClass
+    {
+        HelperClass() {}
+    };
 };

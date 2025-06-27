@@ -16,5 +16,7 @@ namespace contractverify
 
     bool isTypeAllowed(const std::string& type);
 
+    bool hasStateStructPrefix(const std::string& name, const std::string& stateStructName);
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
 }

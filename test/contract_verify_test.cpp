@@ -337,13 +337,28 @@ namespace contractverify
         },
         {
             "test_fail_global_constant.h",
-            "[ ERROR ] Name of global constant has to start with state struct name.\n",
+            "[ ERROR ] Names declared in global scope (constants, structs/classes, functions) have to start with state struct name (TESTCON). Found invalid name: DOES_NOT_START_WITH_STATE_STRUCT_NAME\n",
             "GlobalConstant"
         },
         {
             "test_fail_global_variable.h",
             "[ ERROR ] Global variables are not allowed. You may use global constants (const/constexpr).\n",
             "GlobalVariable"
+        },
+        {
+            "test_fail_global_function.h",
+            "[ ERROR ] Names declared in global scope (constants, structs/classes, functions) have to start with state struct name (TESTCON). Found invalid name: doesNotStartWithStateStructName\n",
+            "GlobalFunction"
+        },
+        {
+            "test_fail_global_struct.h",
+            "[ ERROR ] Names declared in global scope (constants, structs/classes, functions) have to start with state struct name (TESTCON). Found invalid name: DoesNotStartWithStateStructName\n",
+            "GlobalStruct"
+        },
+        {
+            "test_fail_global_class.h",
+            "[ ERROR ] Names declared in global scope (constants, structs/classes, functions) have to start with state struct name (TESTCON). Found invalid name: DoesNotStartWithStateStructName\n",
+            "GlobalClass"
         },
         {
             "test_fail_pointer_declaration.h",

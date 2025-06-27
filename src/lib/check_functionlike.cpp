@@ -55,6 +55,9 @@ namespace contractverify
 
     bool checkFunction(const cppast::CppFunction& func, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
+        if (scopeStack.empty()) // global function name has to start with stateStructName
+            RETURN_IF_FALSE(hasStateStructPrefix(func.name(), stateStructName));
+        
         scopeStack.push(ScopeSpec::FUNC_SIG);
 
         if (func.isTemplated())
