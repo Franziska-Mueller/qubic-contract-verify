@@ -188,6 +188,14 @@ namespace contractverify
             std::cout << "[ ERROR ] Function pointers are not allowed." << std::endl;
             return false;
 
+        case cppast::CppEntityType::CONSTRUCTOR:
+            std::cout << "[ ERROR ] Constructors are not allowed." << std::endl;
+            return false;
+
+        case cppast::CppEntityType::DESTRUCTOR:
+            std::cout << "[ ERROR ] Destructors are not allowed." << std::endl;
+            return false;
+
         case cppast::CppEntityType::THROW_STATEMENT:
             std::cout << "[ ERROR ] `throw` statement is not allowed." << std::endl;
             return false;
@@ -224,12 +232,6 @@ namespace contractverify
 
         case cppast::CppEntityType::TYPE_CONVERTER:
             return checkTypeConverter((const cppast::CppTypeConverter&)entity, stateStructName, scopeStack);
-
-        case cppast::CppEntityType::CONSTRUCTOR:
-            return checkConstructor((const cppast::CppConstructor&)entity, stateStructName, scopeStack);
-
-        case cppast::CppEntityType::DESTRUCTOR:
-            return checkDestructor((const cppast::CppDestructor&)entity, stateStructName, scopeStack);
 
         case cppast::CppEntityType::FUNCTION:
             return checkFunction((const cppast::CppFunction&)entity, stateStructName, scopeStack);

@@ -127,10 +127,6 @@ namespace contractverify
             "Goto"
         },
         {
-            "test_ok_constructor_destructor.h",
-            "ConstructorDestructor"
-        },
-        {
             "test_ok_global_constant.h",
             "GlobalConstant"
         },
@@ -208,6 +204,16 @@ namespace contractverify
             "test_fail_deallocation_delete_array.h",
             "[ ERROR ] Deallocation via `delete` is not allowed.\n",
             "DeallocationDeleteArray"
+        },
+        {
+            "test_fail_constructor.h",
+            "[ ERROR ] Constructors are not allowed.\n",
+            "Constructor"
+        },
+        {
+            "test_fail_destructor.h",
+            "[ ERROR ] Destructors are not allowed.\n",
+            "Destructor"
         },
         {
             "test_fail_div.h",

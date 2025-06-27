@@ -53,46 +53,6 @@ namespace contractverify
         return true;
     }
 
-    bool checkConstructor(const cppast::CppConstructor& constr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
-    {
-        scopeStack.push(ScopeSpec::FUNC_SIG);
-
-        if (constr.isTemplated())
-            RETURN_IF_FALSE(checkTemplSpec(constr.templateSpecification().value(), stateStructName, scopeStack));
-
-        const auto params = GetAllParams(constr);
-        if (!params.empty())
-            RETURN_IF_FALSE(checkParamList(params, stateStructName, scopeStack));
-
-        if (constr.hasMemberInitList())
-        {
-            for (const auto& memInit : constr.memberInits())
-            {
-                RETURN_IF_FALSE(isNameAllowed(memInit.memberName));
-                const std::vector<std::unique_ptr<cppast::CppExpression>>& memberInitArgs = memInit.memberInitInfo.args;
-                for (const auto& arg : memberInitArgs)
-                    RETURN_IF_FALSE(checkExpr(*arg, stateStructName, scopeStack));
-            }
-        }
-
-        if (constr.defn())
-            RETURN_IF_FALSE(checkCompound(*constr.defn(), stateStructName, scopeStack));
-
-        scopeStack.pop();
-        return true;
-    }
-
-    bool checkDestructor(const cppast::CppDestructor& destr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
-    {
-        if (destr.isTemplated())
-            RETURN_IF_FALSE(checkTemplSpec(destr.templateSpecification().value(), stateStructName, scopeStack));
-
-        if (destr.defn())
-            RETURN_IF_FALSE(checkCompound(*destr.defn(), stateStructName, scopeStack));
-
-        return true;
-    }
-
     bool checkFunction(const cppast::CppFunction& func, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
     {
         scopeStack.push(ScopeSpec::FUNC_SIG);
