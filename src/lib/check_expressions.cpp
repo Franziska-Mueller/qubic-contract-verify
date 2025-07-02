@@ -17,7 +17,7 @@ namespace contractverify
     namespace
     {
 
-        bool checkAtomicExpr(const cppast::CppAtomicExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkAtomicExpr(const cppast::CppAtomicExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
             switch (expr.atomicExpressionType())
             {
@@ -30,18 +30,18 @@ namespace contractverify
             case cppast::CppAtomicExprType::NUMBER_LITEREL:
                 return true;
             case cppast::CppAtomicExprType::NAME:
-                return isNameAllowed((static_cast<const cppast::CppNameExpr&>(expr)).value());
+                return isNameAllowed((static_cast<const cppast::CppNameExpr&>(expr)).value(), additionalScopePrefixes);
             case cppast::CppAtomicExprType::VARTYPE:
-                return checkVarType((static_cast<const cppast::CppVartypeExpr&>(expr)).value(), stateStructName, scopeStack);
+                return checkVarType((static_cast<const cppast::CppVartypeExpr&>(expr)).value(), stateStructName, scopeStack, additionalScopePrefixes);
             case cppast::CppAtomicExprType::LAMBDA:
-                return checkLambda((static_cast<const cppast::CppLambdaExpr&>(expr)).lamda(), stateStructName, scopeStack);
+                return checkLambda((static_cast<const cppast::CppLambdaExpr&>(expr)).lamda(), stateStructName, scopeStack, additionalScopePrefixes);
             default:
                 std::cout << "[ ERROR ] Unknown atomic expression type: " << (int)expr.atomicExpressionType() << std::endl;
                 return false;
             }
         }
 
-        bool checkMonomialExpr(const cppast::CppMonomialExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkMonomialExpr(const cppast::CppMonomialExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
             switch (expr.oper())
             {
@@ -55,7 +55,7 @@ namespace contractverify
             case cppast::CppUnaryOperator::LOGICAL_NOT:
             case cppast::CppUnaryOperator::PARENTHESIZE:
             case cppast::CppUnaryOperator::SIZE_OF:
-                return checkExpr(expr.term(), stateStructName, scopeStack);
+                return checkExpr(expr.term(), stateStructName, scopeStack, additionalScopePrefixes);
             case cppast::CppUnaryOperator::DEREFER:
                 std::cout << "[ ERROR ] Pointer dereferencing (unary operator `*`) is not allowed." << std::endl;
                 return false;
@@ -79,7 +79,7 @@ namespace contractverify
             }
         }
 
-        bool checkBinomialExpr(const cppast::CppBinomialExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkBinomialExpr(const cppast::CppBinomialExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
             switch (expr.oper())
             {
@@ -113,8 +113,8 @@ namespace contractverify
             case cppast::CppBinaryOperator::THREE_WAY_CMP:
             case cppast::CppBinaryOperator::USER_LITERAL:
             case cppast::CppBinaryOperator::DOT:
-                return checkExpr(expr.term1(), stateStructName, scopeStack)
-                    && checkExpr(expr.term2(), stateStructName, scopeStack);
+                return checkExpr(expr.term1(), stateStructName, scopeStack, additionalScopePrefixes)
+                    && checkExpr(expr.term2(), stateStructName, scopeStack, additionalScopePrefixes);
             case cppast::CppBinaryOperator::DIV:
             case cppast::CppBinaryOperator::DIV_ASSIGN:
                 std::cout << "[ ERROR ] Division operator `/` is not allowed. Use the `div` function provided in the QPI instead." << std::endl;
@@ -140,47 +140,47 @@ namespace contractverify
             }
         }
 
-        bool checkTrinomialExpr(const cppast::CppTrinomialExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkTrinomialExpr(const cppast::CppTrinomialExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
             switch (expr.oper())
             {
             case cppast::CppTernaryOperator::CONDITIONAL:
-                return checkExpr(expr.term1(), stateStructName, scopeStack)
-                    && checkExpr(expr.term2(), stateStructName, scopeStack)
-                    && checkExpr(expr.term3(), stateStructName, scopeStack);
+                return checkExpr(expr.term1(), stateStructName, scopeStack, additionalScopePrefixes)
+                    && checkExpr(expr.term2(), stateStructName, scopeStack, additionalScopePrefixes)
+                    && checkExpr(expr.term3(), stateStructName, scopeStack, additionalScopePrefixes);
             default:
                 std::cout << "[ ERROR ] Unknown ternary operator: " << (int)expr.oper() << std::endl;
                 return false;
             }
         }
 
-        bool checkFuncCallExpr(const cppast::CppFunctionCallExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkFuncCallExpr(const cppast::CppFunctionCallExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
-            RETURN_IF_FALSE(checkExpr(expr.function(), stateStructName, scopeStack));
+            RETURN_IF_FALSE(checkExpr(expr.function(), stateStructName, scopeStack, additionalScopePrefixes));
             for (size_t i = 0; i < expr.numArgs(); ++i)
-                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack));
+                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack, additionalScopePrefixes));
 
             return true;
         }
 
-        bool checkUniformInitializerExpr(const cppast::CppUniformInitializerExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkUniformInitializerExpr(const cppast::CppUniformInitializerExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
-            RETURN_IF_FALSE(isNameAllowed(expr.name()));
+            RETURN_IF_FALSE(isNameAllowed(expr.name(), additionalScopePrefixes));
             for (size_t i = 0; i < expr.numArgs(); ++i)
-                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack));
+                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack, additionalScopePrefixes));
 
             return true;
         }
 
-        bool checkInitializerListExpr(const cppast::CppInitializerListExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkInitializerListExpr(const cppast::CppInitializerListExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
             for (size_t i = 0; i < expr.numArgs(); ++i)
-                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack));
+                RETURN_IF_FALSE(checkExpr(expr.arg(i), stateStructName, scopeStack, additionalScopePrefixes));
 
             return true;
         }
 
-        bool checkTypecastExpr(const cppast::CppTypecastExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+        bool checkTypecastExpr(const cppast::CppTypecastExpr& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
         {
             switch (expr.castType())
             {
@@ -189,8 +189,8 @@ namespace contractverify
             case cppast::CppTypecastType::STATIC:
             case cppast::CppTypecastType::DYNAMIC:
             case cppast::CppTypecastType::REINTERPRET:
-                return checkVarType(expr.targetType(), stateStructName, scopeStack)
-                    && checkExpr(expr.inputExpresion(), stateStructName, scopeStack);
+                return checkVarType(expr.targetType(), stateStructName, scopeStack, additionalScopePrefixes)
+                    && checkExpr(expr.inputExpresion(), stateStructName, scopeStack, additionalScopePrefixes);
             case cppast::CppTypecastType::CONST:
                 std::cout << "[ ERROR ] `const_cast` is not allowed." << std::endl;
                 return false;
@@ -202,26 +202,26 @@ namespace contractverify
 
     }  // namespace
 
-    bool checkExpr(const cppast::CppExpression& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    bool checkExpr(const cppast::CppExpression& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
     {
         switch (expr.expressionType())
         {
         case cppast::CppExpressionType::ATOMIC:
-            return checkAtomicExpr(static_cast<const cppast::CppAtomicExpr&>(expr), stateStructName, scopeStack);
+            return checkAtomicExpr(static_cast<const cppast::CppAtomicExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::MONOMIAL:
-            return checkMonomialExpr(static_cast<const cppast::CppMonomialExpr&>(expr), stateStructName, scopeStack);
+            return checkMonomialExpr(static_cast<const cppast::CppMonomialExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::BINOMIAL:
-            return checkBinomialExpr(static_cast<const cppast::CppBinomialExpr&>(expr), stateStructName, scopeStack);
+            return checkBinomialExpr(static_cast<const cppast::CppBinomialExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::TRINOMIAL:
-            return checkTrinomialExpr(static_cast<const cppast::CppTrinomialExpr&>(expr), stateStructName, scopeStack);
+            return checkTrinomialExpr(static_cast<const cppast::CppTrinomialExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::FUNCTION_CALL:
-            return checkFuncCallExpr(static_cast<const cppast::CppFunctionCallExpr&>(expr), stateStructName, scopeStack);
+            return checkFuncCallExpr(static_cast<const cppast::CppFunctionCallExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::UNIFORM_INITIALIZER:
-            return checkUniformInitializerExpr(static_cast<const cppast::CppUniformInitializerExpr&>(expr), stateStructName, scopeStack);
+            return checkUniformInitializerExpr(static_cast<const cppast::CppUniformInitializerExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::INITIALIZER_LIST:
-            return checkInitializerListExpr(static_cast<const cppast::CppInitializerListExpr&>(expr), stateStructName, scopeStack);
+            return checkInitializerListExpr(static_cast<const cppast::CppInitializerListExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         case cppast::CppExpressionType::TYPECAST:
-            return checkTypecastExpr(static_cast<const cppast::CppTypecastExpr&>(expr), stateStructName, scopeStack);
+            return checkTypecastExpr(static_cast<const cppast::CppTypecastExpr&>(expr), stateStructName, scopeStack, additionalScopePrefixes);
         default:
             std::cout << "[ ERROR ] Unknown expression type: " << (int)expr.expressionType() << std::endl;
             return false;

@@ -13,7 +13,7 @@
 
 namespace contractverify
 {
-    bool isInheritanceAllowed(const std::string& baseName)
+    bool isInheritanceAllowed(const std::string& baseName, std::vector<std::string>& additionalScopePrefixes)
     {
         if (baseName.compare("QpiContext") == 0)
         {
@@ -23,7 +23,7 @@ namespace contractverify
         return true;
     }
 
-    bool isNameAllowed(const std::string& name)
+    bool isNameAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes)
     {
         // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
 
@@ -42,7 +42,7 @@ namespace contractverify
         return true;
     }
 
-    bool isTypeAllowed(const std::string& type)
+    bool isTypeAllowed(const std::string& type, std::vector<std::string>& additionalScopePrefixes)
     {
         // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
 
@@ -75,7 +75,7 @@ namespace contractverify
         return true;
     }
 
-    bool isScopeResolutionAllowed(const std::string& name)
+    bool isScopeResolutionAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes)
     {
         if (name.find("::") != std::string::npos)
         {
@@ -84,7 +84,7 @@ namespace contractverify
         return true;
     }
 
-    bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
     {
         scopeStack.push(ScopeSpec::TEMPL_SPEC);
 
@@ -96,7 +96,7 @@ namespace contractverify
                     std::visit(Overloaded{
                             [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
                             {
-                                return checkVarType(*varType, stateStructName, scopeStack);
+                                return checkVarType(*varType, stateStructName, scopeStack, additionalScopePrefixes);
                             },
                             [&](const std::unique_ptr<cppast::CppFunctionPointer>& funcPtr) -> bool
                             {
@@ -109,21 +109,21 @@ namespace contractverify
                 );
             }
 
-            RETURN_IF_FALSE(isNameAllowed(param.paramName()));
+            RETURN_IF_FALSE(isNameAllowed(param.paramName(), additionalScopePrefixes));
 
             RETURN_IF_FALSE(
                 std::visit(Overloaded{
                         [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
                         {
                             if (varType)
-                                return checkVarType(*varType, stateStructName, scopeStack);
+                                return checkVarType(*varType, stateStructName, scopeStack, additionalScopePrefixes);
                             else
                                 return true;
                         },
                         [&](const std::unique_ptr<cppast::CppExpression>& expr) -> bool
                         {
                             if (expr)
-                                return checkExpr(*expr, stateStructName, scopeStack);
+                                return checkExpr(*expr, stateStructName, scopeStack, additionalScopePrefixes);
                             else
                                 return true;
                         }
@@ -137,7 +137,7 @@ namespace contractverify
         return true;
     }
 
-    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
     {
         if (scopeStack.empty())
         {
@@ -146,13 +146,13 @@ namespace contractverify
         }
 
         scopeStack.push(ScopeSpec::TYPEDEF);
-        RETURN_IF_FALSE(checkVar(*def.var(), stateStructName, scopeStack));
+        RETURN_IF_FALSE(checkVar(*def.var(), stateStructName, scopeStack, additionalScopePrefixes));
         scopeStack.pop();
 
         return true;
     }
 
-    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack)
+    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
     {
         if (scopeStack.empty())
         {
@@ -161,7 +161,7 @@ namespace contractverify
         }
 
         scopeStack.push(ScopeSpec::TYPEDEF);
-        RETURN_IF_FALSE(checkVarList(defList.varList(), stateStructName, scopeStack));
+        RETURN_IF_FALSE(checkVarList(defList.varList(), stateStructName, scopeStack, additionalScopePrefixes));
         scopeStack.pop();
 
         return true;

@@ -25,9 +25,7 @@ int main(int argc, char** argv)
     if (!contractAST)
         return 1;
 
-    std::string stateStructName = contractverify::findStateStructName(*contractAST);
-
-    if (contractverify::checkCompliance(*contractAST, stateStructName))
+    if (contractverify::checkCompliance(*contractAST))
         return 0;
     else
         return 1;

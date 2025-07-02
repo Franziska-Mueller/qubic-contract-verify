@@ -10,19 +10,19 @@
 
 namespace contractverify
 {
-    bool isInheritanceAllowed(const std::string& baseName);
+    bool isInheritanceAllowed(const std::string& baseName, std::vector<std::string>& additionalScopePrefixes);
 
-    bool isNameAllowed(const std::string& name);
+    bool isNameAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes);
 
-    bool isTypeAllowed(const std::string& type);
+    bool isTypeAllowed(const std::string& type, std::vector<std::string>& additionalScopePrefixes);
 
     bool hasStateStructPrefix(const std::string& name, const std::string& stateStructName);
 
-    bool isScopeResolutionAllowed(const std::string& name);
+    bool isScopeResolutionAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes);
 
-    bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
+    bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes);
 
-    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
+    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes);
 
-    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack);
+    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes);
 }
