@@ -165,7 +165,7 @@ namespace contractverify
             return true;
 
         case cppast::CppEntityType::ENUM:
-            // TODO: collect name in additionalScopePrefixes
+            additionalScopePrefixes.push_back(static_cast<const cppast::CppEnum&>(entity).name());
             return true;
 
         case cppast::CppEntityType::MACRO_CALL:
@@ -209,68 +209,68 @@ namespace contractverify
             return false;
 
         case cppast::CppEntityType::COMPOUND:
-            return checkCompound((const cppast::CppCompound&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkCompound(static_cast<const cppast::CppCompound&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::VAR:
-            return checkVar((const cppast::CppVar&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkVar(static_cast<const cppast::CppVar&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::VAR_LIST:
-            return checkVarList((const cppast::CppVarList&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkVarList(static_cast<const cppast::CppVarList&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::USING_NAMESPACE:
-            return checkUsingNamespace((const cppast::CppUsingNamespaceDecl&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkUsingNamespace(static_cast<const cppast::CppUsingNamespaceDecl&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::USING_DECL:
-            return checkUsingDecl((const cppast::CppUsingDecl&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkUsingDecl(static_cast<const cppast::CppUsingDecl&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::TYPEDEF_DECL:
-            return checkTypedef((const cppast::CppTypedefName&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkTypedef(static_cast<const cppast::CppTypedefName&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::TYPEDEF_DECL_LIST:
-            return checkTypedefList((const cppast::CppTypedefList&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkTypedefList(static_cast<const cppast::CppTypedefList&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::GOTO_STATEMENT:
-            return checkGotoStatement((const cppast::CppGotoStatement&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkGotoStatement(static_cast<const cppast::CppGotoStatement&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::FORWARD_CLASS_DECL:
-            return checkFwdDecl((const cppast::CppForwardClassDecl&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkFwdDecl(static_cast<const cppast::CppForwardClassDecl&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::TYPE_CONVERTER:
-            return checkTypeConverter((const cppast::CppTypeConverter&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkTypeConverter(static_cast<const cppast::CppTypeConverter&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::FUNCTION:
-            return checkFunction((const cppast::CppFunction&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkFunction(static_cast<const cppast::CppFunction&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::LAMBDA:
-            return checkLambda((const cppast::CppLambda&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkLambda(static_cast<const cppast::CppLambda&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::EXPRESSION:
-            return checkExpr((const cppast::CppExpression&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkExpr(static_cast<const cppast::CppExpression&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::RETURN_STATEMENT:
-            return checkReturn((const cppast::CppReturnStatement&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkReturn(static_cast<const cppast::CppReturnStatement&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::IF_BLOCK:
-            return checkIfBlock((const cppast::CppIfBlock&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkIfBlock(static_cast<const cppast::CppIfBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::FOR_BLOCK:
-            return checkForBlock((const cppast::CppForBlock&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkForBlock(static_cast<const cppast::CppForBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::RANGE_FOR_BLOCK:
-            return checkRangeForBlock((const cppast::CppRangeForBlock&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkRangeForBlock(static_cast<const cppast::CppRangeForBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::WHILE_BLOCK:
-            return checkWhileBlock((const cppast::CppWhileBlock&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkWhileBlock(static_cast<const cppast::CppWhileBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::DO_WHILE_BLOCK:
-            return checkDoWhileBlock((const cppast::CppDoWhileBlock&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkDoWhileBlock(static_cast<const cppast::CppDoWhileBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         case cppast::CppEntityType::SWITCH_BLOCK:
-            return checkSwitchBlock((const cppast::CppSwitchBlock&)entity, stateStructName, scopeStack, additionalScopePrefixes);
+            return checkSwitchBlock(static_cast<const cppast::CppSwitchBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
 
         default:
             // control should never reach here
-            std::cout << "[ ERROR ] Unknown CppEntityType encountered while analyzing the AST: " << (int)entity.entityType() << std::endl;
+            std::cout << "[ ERROR ] Unknown CppEntityType encountered while analyzing the AST: " << static_cast<int>(entity.entityType()) << std::endl;
             return false;
         }
     }
@@ -311,7 +311,7 @@ namespace contractverify
             {
                 if (name.empty() && entity.entityType() == cppast::CppEntityType::COMPOUND)
                 {
-                    const auto& compound = (const cppast::CppCompound&)entity;
+                    const auto& compound = static_cast<const cppast::CppCompound&>(entity);
                     if (compound.compoundType() == cppast::CppCompoundType::STRUCT)
                     {
                         for (const auto& baseClass : compound.inheritanceList())
