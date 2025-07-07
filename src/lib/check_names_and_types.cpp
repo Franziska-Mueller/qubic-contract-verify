@@ -1,5 +1,6 @@
 #include "check_names_and_types.h"
 
+#include <algorithm>
 #include <iostream>
 #include <stack>
 #include <string>
@@ -25,7 +26,7 @@ namespace contractverify
 
     bool isNameAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes)
     {
-        // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+        RETURN_IF_FALSE(isScopeResolutionAllowed(name, additionalScopePrefixes));
 
         // names starting with double underscores are reserved for internal functions and compiler macros
         if (name.compare(0, 2, "__") == 0)
@@ -44,7 +45,7 @@ namespace contractverify
 
     bool isTypeAllowed(const std::string& type, std::vector<std::string>& additionalScopePrefixes)
     {
-        // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+        RETURN_IF_FALSE(isScopeResolutionAllowed(type, additionalScopePrefixes));
 
         if (type.length() >= 3 && type.compare(type.length() - 3, 3, "...") == 0)
         {
@@ -77,9 +78,17 @@ namespace contractverify
 
     bool isScopeResolutionAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes)
     {
-        if (name.find("::") != std::string::npos)
+        std::size_t pos = name.find("::");
+        if (pos != std::string::npos)
         {
-            // TODO
+            std::string prefix = name.substr(0, pos);
+            auto matchesPrefix = [&](const std::string& s) -> bool { return prefix.compare(s) == 0; };
+            if (std::any_of(allowedScopePrefixes.begin(), allowedScopePrefixes.end(), matchesPrefix))
+                return true;
+            if (std::any_of(additionalScopePrefixes.begin(), additionalScopePrefixes.end(), matchesPrefix))
+                return true;
+            std::cout << "[ ERROR ] Scope resolution with prefix " << prefix << " is not allowed." << std::endl;
+            return false;
         }
         return true;
     }

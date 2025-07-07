@@ -81,11 +81,11 @@ namespace contractverify
         "TESTEXB",
         // the following names are defined and used in the same contract file
         // -> TODO: add structs/enums from same file to whitelist before checking compliance
-        "QBAYLogInfo",
-        "QuotteryLogInfo",
-        "AssetAskOrders_output",
-        "AssetBidOrders_output",
-        "EntityAskOrders_output",
-        "EntityBidOrders_output",
+        //"QBAYLogInfo",
+        //"QuotteryLogInfo",
+        //"AssetAskOrders_output",
+        //"AssetBidOrders_output",
+        //"EntityAskOrders_output",
+        //"EntityBidOrders_output",
     };
 }

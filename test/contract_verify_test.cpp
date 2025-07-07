@@ -146,6 +146,14 @@ namespace contractverify
             "test_ok_typedef_local.h",
             "TypedefLocal"
         },
+        {
+            "test_ok_scope_resolution_using_declaration.h",
+            "ScopeResolutionUsingDeclaration"
+        },
+        {
+            "test_ok_scope_resolution_local_enum.h",
+            "ScopeResolutionLocalEnum"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -388,6 +396,16 @@ namespace contractverify
             "test_fail_local_variable.h",
             "[ ERROR ] Local variables are not allowed.\n",
             "LocalVariable"
+        },
+        {
+            "test_fail_scope_resolution_function_call.h",
+            "[ ERROR ] Scope resolution with prefix someNamespace is not allowed.\n",
+            "ScopeResolutionFunctionCall"
+        },
+        {
+            "test_fail_scope_resolution_variable.h",
+            "[ ERROR ] Scope resolution with prefix myNumbers is not allowed.\n",
+            "ScopeResolutionVariable"
         },
     };
 

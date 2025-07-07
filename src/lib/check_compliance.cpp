@@ -31,7 +31,7 @@ namespace contractverify
                 }
             }
 
-            // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
+            RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), additionalScopePrefixes));
 
             return true;
         }
@@ -49,8 +49,7 @@ namespace contractverify
             if (decl.isTemplated())
                 RETURN_IF_FALSE(checkTemplSpec(decl.templateSpecification().value(), stateStructName, scopeStack, additionalScopePrefixes));
 
-            // TODO: scope resolution :: -> only structs, enums, namespaces defined in contracts and qpi.h
-            // -> is this contained in decl.name() ?
+            RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), additionalScopePrefixes));
 
             RETURN_IF_FALSE(
                 std::visit(Overloaded{ 
