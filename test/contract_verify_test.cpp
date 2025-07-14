@@ -184,12 +184,12 @@ namespace contractverify
         },
         {
             "test_fail_string_literal.h",
-            "[ ERROR ] String literals are not allowed.\n",
+            "[ ERROR ] String literals are not allowed, found \"I am a string literal\".\n",
             "StringLiteral"
         },
         {
             "test_fail_char_literal.h",
-            "[ ERROR ] Char literals are not allowed.\n",
+            "[ ERROR ] Char literals are not allowed, found 'c'.\n",
             "CharLiteral"
         },
         {
@@ -394,7 +394,7 @@ namespace contractverify
         },
         {
             "test_fail_local_variable.h",
-            "[ ERROR ] Local variables are not allowed.\n",
+            "[ ERROR ] Local variables are not allowed, found variable with name fee.\n",
             "LocalVariable"
         },
         {

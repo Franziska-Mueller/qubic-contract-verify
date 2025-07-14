@@ -86,7 +86,7 @@ namespace contractverify
         if (!(scopeStack.empty() || scopeStack.top() == ScopeSpec::STRUCT || scopeStack.top() == ScopeSpec::CLASS 
             || scopeStack.top() == ScopeSpec::FUNC_SIG || scopeStack.top() == ScopeSpec::TYPEDEF))
         {
-            std::cout << "[ ERROR ] Local variables are not allowed." << std::endl;
+            std::cout << "[ ERROR ] Local variables are not allowed, found variable with name " << var.name() << "." << std::endl;
             return false;
         }
 

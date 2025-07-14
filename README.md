@@ -11,7 +11,7 @@ Download/clone the CppParser repository from https://github.com/satya-das/cpppar
 `cmake ..`
 
 cmake will try to find the CppParser dependency (variable `cppparser_DIR`). If it cannot find it automatically, manually point the variable to the `CppParser/builds/` directory (the one containing `cppparserConfig.cmake`).
-You can configure cmake whether to include the test project by setting the `BUILD_TESTS` variable accordingly.
+You can configure cmake whether to include the test project by setting the `BUILD_CONTRACTVERIFY_TESTS` variable accordingly.
 
 On linux, you can then build via `make`. On Windows, you can build the solution file cmake created.
 

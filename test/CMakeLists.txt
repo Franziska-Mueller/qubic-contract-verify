@@ -1,10 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
-project(test LANGUAGES CXX)
-
-# GoogleTest requires at least C++17
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+# Fetch googletest for test project
 include(FetchContent)
 FetchContent_Declare(
   googletest

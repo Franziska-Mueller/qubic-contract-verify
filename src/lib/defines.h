@@ -69,6 +69,7 @@ namespace contractverify
     static const std::vector<std::string> allowedScopePrefixes = {
         // QPI and names defined in qpi.h
         "QPI",
+        "id",
         "ProposalTypes",
         "TransferType",
         "AssetIssuanceSelect",
@@ -79,13 +80,5 @@ namespace contractverify
         "QX",
         "TESTEXA",
         "TESTEXB",
-        // the following names are defined and used in the same contract file
-        // -> TODO: add structs/enums from same file to whitelist before checking compliance
-        //"QBAYLogInfo",
-        //"QuotteryLogInfo",
-        //"AssetAskOrders_output",
-        //"AssetBidOrders_output",
-        //"EntityAskOrders_output",
-        //"EntityBidOrders_output",
     };
 }

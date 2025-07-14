@@ -22,10 +22,12 @@ namespace contractverify
             switch (expr.atomicExpressionType())
             {
             case cppast::CppAtomicExprType::STRING_LITERAL:
-                std::cout << "[ ERROR ] String literals are not allowed." << std::endl;
+                std::cout << "[ ERROR ] String literals are not allowed, found " 
+                    << static_cast<const cppast::CppStringLiteralExpr&>(expr).value() << "." << std::endl;
                 return false;
             case cppast::CppAtomicExprType::CHAR_LITERAL:
-                std::cout << "[ ERROR ] Char literals are not allowed." << std::endl;
+                std::cout << "[ ERROR ] Char literals are not allowed, found " 
+                    << static_cast<const cppast::CppCharLiteralExpr&>(expr).value() << "." << std::endl;
                 return false;
             case cppast::CppAtomicExprType::NUMBER_LITEREL:
                 return true;
