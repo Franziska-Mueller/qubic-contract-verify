@@ -1,6 +1,6 @@
 # Prerequisites
 
-Download/clone the CppParser repository from https://github.com/satya-das/cppparser and build it.
+Build the CppParser dependency (in `deps/cppparser/`) following the steps described in the [original repository](https://github.com/satya-das/cppparser?tab=readme-ov-file#building-cppparser).
 
 # How to build
 
