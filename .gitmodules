@@ -1,0 +1,6 @@
+[submodule "deps/cppparser"]
+	path = deps/cppparser
+	url = git@github.com:satya-das/cppparser.git
+[submodule "deps/common"]
+	path = deps/common
+	url = git@github.com:satya-das/common.git

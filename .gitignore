@@ -2,3 +2,5 @@
 
 build/*
 builds/*
+deps/cppparser/build/*
+deps/cppparser/builds/*
