@@ -34,3 +34,5 @@ target_include_directories(
 
 include(GoogleTest)
 gtest_discover_tests(${TEST_EXE})
+
+add_test(${TEST_EXE} ${TEST_EXE})
