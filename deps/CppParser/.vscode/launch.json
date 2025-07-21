@@ -1,0 +1,56 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run parser test",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/cppparser/test/cppparsertest",
+      // "args": [
+      //   "-p",
+      //   "/home/dassat/github/cppparser/cppparser/test/e2e/test_input/ObjectArxHeaders/AcFdUtil.h"
+      // ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/cppparser/test/",
+      "environment": [
+        {
+          "name": "ZZDEBUG",
+          "value": "0"
+        }
+      ],
+      "preLaunchTask": "BuildAll",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Run unit test",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/cppparser/test/cppparserunittest",
+      "args": [
+        "Attribute specifier sequence"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/cppparser/test/",
+      "preLaunchTask": "BuildAll",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]

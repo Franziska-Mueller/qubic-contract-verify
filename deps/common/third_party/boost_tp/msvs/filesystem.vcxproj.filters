@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libs\filesystem\src\codecvt_error_category.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\operations.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\path.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\path_traits.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\portability.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\unique_path.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\utf8_codecvt_facet.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\filesystem\src\windows_file_codecvt.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libs\filesystem\src\windows_file_codecvt.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

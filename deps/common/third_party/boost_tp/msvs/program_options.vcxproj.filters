@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libs\program_options\src\cmdline.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\config_file.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\convert.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\options_description.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\parsers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\positional_options.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\split.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\utf8_codecvt_facet.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\value_semantic.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\variables_map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\program_options\src\winmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

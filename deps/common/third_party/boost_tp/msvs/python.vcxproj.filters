@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\converter">
+      <UniqueIdentifier>{31587965-0366-4451-89fe-3a35b2de417a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\object">
+      <UniqueIdentifier>{6debde89-c9ba-481a-b2c0-2e15091f28b3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libs\python\src\dict.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\errors.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\exec.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\import.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\list.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\long.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\module.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\numeric.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object_operators.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object_protocol.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\slice.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\str.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\tuple.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\wrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\converter\arg_to_python_base.cpp">
+      <Filter>src\converter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\converter\builtin_converters.cpp">
+      <Filter>src\converter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\converter\from_python.cpp">
+      <Filter>src\converter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\converter\registry.cpp">
+      <Filter>src\converter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\converter\type_id.cpp">
+      <Filter>src\converter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\class.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\enum.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\function.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\function_doc_signature.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\inheritance.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\iterator.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\life_support.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\pickle_support.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\python\src\object\stl_iterator.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
