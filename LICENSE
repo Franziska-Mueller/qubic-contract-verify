@@ -1,4 +1,4 @@
-The code in deps/common was obtained from [this repository](https://github.com/satya-das/common/).
+The code in deps/common was obtained from https://github.com/satya-das/common/.
 
 License of deps/common:
 -============================-
@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 -===============================================================================-
 
-The code in deps/CppParser was obtained from [this repository](https://github.com/satya-das/cppparser/).
+The code in deps/CppParser was obtained from https://github.com/satya-das/cppparser/.
 
 License of deps/CppParser:
 -============================-
