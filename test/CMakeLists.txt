@@ -13,8 +13,6 @@ FetchContent_MakeAvailable(googletest)
 get_filename_component(TEST_FILE_PATH testfiles ABSOLUTE)
 configure_file(test_files_config.h.in test_files_config.h)
 
-enable_testing()
-
 add_executable(
   ${TEST_EXE}
   contract_verify_test.cpp

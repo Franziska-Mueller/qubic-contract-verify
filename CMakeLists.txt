@@ -11,6 +11,7 @@ add_subdirectory(src)
 set(BUILD_CONTRACTVERIFY_TESTS TRUE CACHE BOOL "Builds the contract verify test project")
 
 if(${BUILD_CONTRACTVERIFY_TESTS})
+  enable_testing()
   set(TEST_EXE "contractverifytest")
   add_subdirectory(test)
 endif()

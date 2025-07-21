@@ -1,6 +1,6 @@
 # Search dependency cppparser
 # It should already be built in the following location if the instructions were followed correctly.
-set(cppparser_DIR "${CMAKE_SOURCE_DIR}/deps/cppparser/builds/" CACHE PATH "The directory containing a CMake configuration file for cppparser.")
+set(cppparser_DIR "${CMAKE_SOURCE_DIR}/deps/CppParser/builds/" CACHE PATH "The directory containing a CMake configuration file for cppparser.")
 find_package(cppparser REQUIRED)
 
 # Library for contract verification
