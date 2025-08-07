@@ -1,0 +1,7 @@
+# ignore build files
+
+deps/CppParser/build
+deps/CppParser/builds
+
+**/.gitignore
+**/.vscode
