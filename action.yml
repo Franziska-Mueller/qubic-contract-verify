@@ -1,0 +1,16 @@
+# action.yml
+name: 'Qubic Contract Verify'
+description: 'Run the Qubic contract verification tool on an input file'
+inputs:
+  filepath: # id of input
+    description: 'Input file to verify'
+    required: true
+    default: ''
+outputs:
+  success: # id of output
+    description: 'Whether the verification succeeded'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.filepath }}
