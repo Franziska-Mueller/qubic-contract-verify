@@ -7,8 +7,6 @@ RUN apt-get update;              \
     apt-get install -y flex ;    \
     apt-get install -y clang-tidy  
 
-WORKDIR /contract-verify
-
 # Copy source code and cmake files
 COPY ./deps /contract-verify/deps
 COPY ./src /contract-verify/src
@@ -28,4 +26,8 @@ RUN cd /contract-verify/ ;             \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_CONTRACTVERIFY_TESTS:BOOL=OFF .. ;    \
     cmake --build . --config Release
 
-CMD [ "./build/src/contractverify" ]
+# Copy entrypoint script from repository to the filesystem path `/` of the container
+COPY entrypoint.sh /entrypoint.sh
+
+# Execute `entrypoint.sh` when the Docker container starts up
+ENTRYPOINT ["/entrypoint.sh"]
