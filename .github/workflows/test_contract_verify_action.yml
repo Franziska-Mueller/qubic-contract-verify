@@ -1,0 +1,19 @@
+on: [push]
+
+jobs:
+  test_contract_verify_job:
+    runs-on: ubuntu-latest
+    name: Test contract verify action
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Contract verify action step
+        uses: ./ # Uses an action in the root directory
+        id: verify
+        with:
+          filepath: '/github/workspace/test/testfiles/test_ok.h'
+      # Use the output from the `verify` step
+      - name: Get the output
+        run: echo "Contract verification succeeded ${{ steps.verify.outputs.success }}"
