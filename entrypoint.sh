@@ -5,9 +5,7 @@ printf '%d args:' "$#"
 printf " '%s'" "$@"
 printf '\n'
 
-EXIT_CODE=$(/contract-verify/build/src/contractverify "$@")
-
-if [ "${EXIT_CODE}" = "0" ]
+if /contract-verify/build/src/contractverify "$@"
 then
     echo "success=true" >> $GITHUB_OUTPUT
 else
