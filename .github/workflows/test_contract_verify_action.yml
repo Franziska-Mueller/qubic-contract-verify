@@ -16,4 +16,4 @@ jobs:
           filepath: '/github/workspace/test/testfiles/test_ok_function.h'
       # Use the output from the `verify` step
       - name: Get the output
-        run: echo "Contract verification exited with code ${{ steps.verify.outputs.success }}"
+        run: echo "Contract verification succeeded -> ${{ steps.verify.outputs.success }}"
