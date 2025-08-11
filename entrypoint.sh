@@ -7,7 +7,7 @@ printf '\n'
 
 /contract-verify/build/src/contractverify $@
 
-if (( $? == "0" ))
+if (( "$?" == "0" ))
 then
     echo "success=true" >> $GITHUB_OUTPUT
 else
