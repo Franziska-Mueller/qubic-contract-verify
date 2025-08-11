@@ -27,7 +27,7 @@ RUN cd /contract-verify/ ;             \
     cmake --build . --config Release
 
 # Copy entrypoint script from repository to the filesystem path `/` of the container
-COPY entrypoint.sh /entrypoint.sh
+COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
 # Execute `entrypoint.sh` when the Docker container starts up
 ENTRYPOINT ["/entrypoint.sh"]

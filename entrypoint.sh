@@ -5,4 +5,4 @@ printf '%d args:' "$#"
 printf " '%s'" "$@"
 printf '\n'
 
-./build/src/contractverify $@
+/contract-verify/build/src/contractverify $@
