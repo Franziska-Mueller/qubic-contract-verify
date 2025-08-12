@@ -1,5 +1,6 @@
 #include "check_compliance.h"
 
+#include <filesystem>
 #include <iostream>
 #include <stack>
 #include <string>
@@ -289,6 +290,12 @@ namespace contractverify
 
     std::unique_ptr<cppast::CppCompound> parseAST(const std::string& filepath)
     {
+        // Check that file exists because CppParser does not have a check
+        if (!std::filesystem::exists(filepath))
+        {
+            std::cout << "[ ERROR ] File does not exist: " << filepath << "." << std::endl;
+            return nullptr;
+        }
         cppparser::CppParser parser;
         parser.addKnownMacros(knownMacroNames);
         return parser.parseFile(filepath.c_str());
