@@ -7,7 +7,7 @@ printf '\n'
 
 if /contract-verify/build/src/contractverify "$@"
 then
-    echo "success=true" >> $GITHUB_OUTPUT
+    exit 0
 else
-    echo "success=false" >> $GITHUB_OUTPUT
+    exit 1
 fi
