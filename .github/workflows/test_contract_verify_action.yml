@@ -1,9 +1,10 @@
+name: Test contract verify action
+
 on: [push]
 
 jobs:
   test_contract_verify_job:
     runs-on: ubuntu-latest
-    name: Test contract verify action
     steps:
       # To use this repository's private action,
       # you must check out the repository
