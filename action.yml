@@ -1,5 +1,9 @@
 name: 'Qubic Contract Verify'
 description: 'Run the Qubic contract verification tool on one or multiple files'
+branding:
+  icon: 'check-square'
+  color: 'blue'
+
 inputs:
   filepaths:
     description: 'Input file(s) to verify, comma separated (no spaces)'
