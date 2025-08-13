@@ -14,4 +14,4 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: verify
         with:
-          filepath: '/github/workspace/test/testfiles/test_ok_function.h'
+          filepaths: 'test/testfiles/test_ok_function.h,test/testfiles/test_ok_lambda.h'
