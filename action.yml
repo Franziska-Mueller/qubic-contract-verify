@@ -1,9 +1,8 @@
-# action.yml
 name: 'Qubic Contract Verify'
-description: 'Run the Qubic contract verification tool on an input file'
+description: 'Run the Qubic contract verification tool on one or multiple files'
 inputs:
-  filepaths: # id of input
-    description: 'Input file(s) to verify, comma separated'
+  filepaths:
+    description: 'Input file(s) to verify, comma separated (no spaces)'
     required: true
     default: ''
 runs:
