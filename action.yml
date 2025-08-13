@@ -2,12 +2,12 @@
 name: 'Qubic Contract Verify'
 description: 'Run the Qubic contract verification tool on an input file'
 inputs:
-  filepath: # id of input
-    description: 'Input file to verify'
+  filepaths: # id of input
+    description: 'Input file(s) to verify, comma separated'
     required: true
     default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.filepath }}
+    - ${{ inputs.filepaths }}
