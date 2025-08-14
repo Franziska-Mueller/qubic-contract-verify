@@ -407,6 +407,16 @@ namespace contractverify
             "[ ERROR ] Scope resolution with prefix myNumbers is not allowed.\n",
             "ScopeResolutionVariable"
         },
+        {
+            "test_fail_restricted_function_call.h",
+            "[ ERROR ] Names starting with double underscores are reserved.\n",
+            "RestrictedFunctionCall"
+        },
+        {
+            "test_fail_restricted_variable.h",
+            "[ ERROR ] Names starting with double underscores are reserved.\n",
+            "RestrictedVariable"
+        },
     };
 
     INSTANTIATE_TEST_SUITE_P(CVST,
