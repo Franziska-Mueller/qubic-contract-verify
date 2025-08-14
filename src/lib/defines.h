@@ -64,6 +64,7 @@ namespace contractverify
         "QUERY_ORACLE",
         "SELF",
         "SELF_INDEX",
+        "STATIC_ASSERT",
     };
 
     static const std::vector<std::string> allowedScopePrefixes = {
