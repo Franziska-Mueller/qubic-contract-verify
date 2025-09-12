@@ -96,6 +96,16 @@ namespace contractverify
         return true;
     }
 
+    bool isInputOutputType(const std::string& name)
+    {
+        if (name.length() >= 6 && name.compare(name.length() - 6, 6, "_input") == 0)
+            return true;
+        if (name.length() >= 7 && name.compare(name.length() - 7, 7, "_output") == 0)
+            return true;
+
+        return false;
+    }
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, AnalysisData& analysisData)
     {
         analysisData.scopeStack.push(ScopeSpec::TEMPL_SPEC);
