@@ -408,6 +408,11 @@ namespace contractverify
             "ScopeResolutionVariable"
         },
         {
+            "test_fail_scoped_inheritance.h",
+            "[ ERROR ] Scope resolution with prefix foo is not allowed.\n",
+            "ScopedInheritance"
+        },
+        {
             "test_fail_restricted_function_call.h",
             "[ ERROR ] Names starting with double underscores are reserved.\n",
             "RestrictedFunctionCall"
