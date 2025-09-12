@@ -10,5 +10,5 @@
 
 namespace contractverify
 {
-    bool checkExpr(const cppast::CppExpression& expr, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes);
+    bool checkExpr(const cppast::CppExpression& expr, const std::string& stateStructName, AnalysisData& analysisData);
 }

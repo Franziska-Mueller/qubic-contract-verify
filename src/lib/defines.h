@@ -16,6 +16,14 @@ namespace contractverify
         TYPEDEF = 6,  // this is needed to distinguish local variables (forbidden) from local typedefs (allowed)
     };
 
+    struct AnalysisData
+    {
+        // data that will be collected while traversing the AST
+        std::stack<ScopeSpec> scopeStack; // empty scope stack means global scope
+        std::vector<std::string> additionalScopePrefixes;
+        std::vector<std::string> additionalInputOutputTypes;
+    };
+
     // helper struct for visiting variants
     // refer to https://en.cppreference.com/w/cpp/utility/variant/visit2 for details
     template <class... Ts>
@@ -91,7 +99,13 @@ namespace contractverify
         "QBAY",
         "QSWAP",
         "NOST",
+        "QDRAW",
         "TESTEXA",
         "TESTEXB",
+    };
+
+    static const std::vector<std::string> allowedInputOutputTypes = {
+        // types and structs defined in qpi.h
+        "id",
     };
 }

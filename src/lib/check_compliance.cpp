@@ -20,10 +20,10 @@ namespace contractverify
 {
     namespace
     {
-        bool checkUsingNamespace(const cppast::CppUsingNamespaceDecl& decl, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+        bool checkUsingNamespace(const cppast::CppUsingNamespaceDecl& decl, const std::string& stateStructName, AnalysisData& analysisData)
         {
             // in global scope, only namespace QPI is allowed
-            if (scopeStack.empty()) // global scope
+            if (analysisData.scopeStack.empty()) // global scope
             {
                 if (decl.name().compare("QPI") != 0)
                 {
@@ -32,25 +32,25 @@ namespace contractverify
                 }
             }
 
-            RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), additionalScopePrefixes));
+            RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), analysisData.additionalScopePrefixes));
 
             return true;
         }
 
-        bool checkUsingDecl(const cppast::CppUsingDecl& decl, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+        bool checkUsingDecl(const cppast::CppUsingDecl& decl, const std::string& stateStructName, AnalysisData& analysisData)
         {
             // in global scope not allowed, otherwise ok
 
-            if (scopeStack.empty()) // global scope
+            if (analysisData.scopeStack.empty()) // global scope
             {
                 std::cout << "[ ERROR ] Using declaration is not allowed in global scope." << std::endl;
                 return false;
             }
 
             if (decl.isTemplated())
-                RETURN_IF_FALSE(checkTemplSpec(decl.templateSpecification().value(), stateStructName, scopeStack, additionalScopePrefixes));
+                RETURN_IF_FALSE(checkTemplSpec(decl.templateSpecification().value(), stateStructName, analysisData));
 
-            RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), additionalScopePrefixes));
+            RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), analysisData.additionalScopePrefixes));
 
             RETURN_IF_FALSE(
                 std::visit(Overloaded{ 
@@ -58,7 +58,7 @@ namespace contractverify
                         {
                             if (varType)
                             {
-                                return checkVarType(*varType, stateStructName, scopeStack, additionalScopePrefixes);
+                                return checkVarType(*varType, stateStructName, analysisData);
                             }
                             return true;
                         },
@@ -75,7 +75,7 @@ namespace contractverify
                         {
                             if (compound)
                             {
-                                return checkCompound(*compound, stateStructName, scopeStack, additionalScopePrefixes);
+                                return checkCompound(*compound, stateStructName, analysisData);
                             }
                             return true;
                         } 
@@ -87,16 +87,16 @@ namespace contractverify
             return true;
         }
 
-        bool checkFwdDecl(const cppast::CppForwardClassDecl& fwdDecl, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+        bool checkFwdDecl(const cppast::CppForwardClassDecl& fwdDecl, const std::string& stateStructName, AnalysisData& analysisData)
         {
             if (fwdDecl.isTemplated())
-                RETURN_IF_FALSE(checkTemplSpec(fwdDecl.templateSpecification().value(), stateStructName, scopeStack, additionalScopePrefixes));
+                RETURN_IF_FALSE(checkTemplSpec(fwdDecl.templateSpecification().value(), stateStructName, analysisData));
             return true;
         }
 
     }  // namespace
 
-    bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+    bool checkCompound(const cppast::CppCompound& compound, const std::string& stateStructName, AnalysisData& analysisData)
     {
         if (IsNamespaceLike(compound))
         {
@@ -107,15 +107,15 @@ namespace contractverify
             }
             if (compound.isTemplated())
             {
-                checkTemplSpec(compound.templateSpecification().value(), stateStructName, scopeStack, additionalScopePrefixes);
+                checkTemplSpec(compound.templateSpecification().value(), stateStructName, analysisData);
             }
-            RETURN_IF_FALSE(isNameAllowed(compound.name(), additionalScopePrefixes));
+            RETURN_IF_FALSE(isNameAllowed(compound.name(), analysisData.additionalScopePrefixes));
         }
         if (!compound.inheritanceList().empty())
         {
             for (const auto& inheritanceInfo : compound.inheritanceList())
             {
-                RETURN_IF_FALSE(isInheritanceAllowed(inheritanceInfo.baseName, additionalScopePrefixes));
+                RETURN_IF_FALSE(isInheritanceAllowed(inheritanceInfo.baseName, analysisData.additionalScopePrefixes));
             }
         }
 
@@ -123,37 +123,37 @@ namespace contractverify
         switch (compound.compoundType())
         {
         case cppast::CppCompoundType::STRUCT:
-            if (scopeStack.empty()) // global struct name has to start with stateStructName  
+            if (analysisData.scopeStack.empty()) // global struct name has to start with stateStructName  
                 RETURN_IF_FALSE(hasStateStructPrefix(compound.name(), stateStructName));
-            additionalScopePrefixes.push_back(compound.name());
-            scopeStack.push(ScopeSpec::STRUCT);
+            analysisData.additionalScopePrefixes.push_back(compound.name());
+            analysisData.scopeStack.push(ScopeSpec::STRUCT);
             break;
         case cppast::CppCompoundType::CLASS:
-            if (scopeStack.empty()) // global class name has to start with stateStructName
+            if (analysisData.scopeStack.empty()) // global class name has to start with stateStructName
                 RETURN_IF_FALSE(hasStateStructPrefix(compound.name(), stateStructName));
-            additionalScopePrefixes.push_back(compound.name());
-            scopeStack.push(ScopeSpec::CLASS);
+            analysisData.additionalScopePrefixes.push_back(compound.name());
+            analysisData.scopeStack.push(ScopeSpec::CLASS);
             break;
         case cppast::CppCompoundType::NAMESPACE:
-            scopeStack.push(ScopeSpec::NAMESPACE);
+            analysisData.scopeStack.push(ScopeSpec::NAMESPACE);
             break;
         case cppast::CppCompoundType::BLOCK:
         case cppast::CppCompoundType::EXTERN_C_BLOCK:
-            scopeStack.push(ScopeSpec::BLOCK);
+            analysisData.scopeStack.push(ScopeSpec::BLOCK);
             break;
         default:
             scopeStackPushed = false;
             break;
         }
 
-        bool checkSucceeded = compound.visitAll([&](const cppast::CppEntity& ent) -> bool { return checkEntity(ent, stateStructName, scopeStack, additionalScopePrefixes); });
+        bool checkSucceeded = compound.visitAll([&](const cppast::CppEntity& ent) -> bool { return checkEntity(ent, stateStructName, analysisData); });
         if (scopeStackPushed)
-            scopeStack.pop();
+            analysisData.scopeStack.pop();
 
         return checkSucceeded;
     }
 
-    bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+    bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, AnalysisData& analysisData)
     {
         switch (entity.entityType())
         {
@@ -165,7 +165,7 @@ namespace contractverify
             return true;
 
         case cppast::CppEntityType::ENUM:
-            additionalScopePrefixes.push_back(static_cast<const cppast::CppEnum&>(entity).name());
+            analysisData.additionalScopePrefixes.push_back(static_cast<const cppast::CppEnum&>(entity).name());
             return true;
 
         case cppast::CppEntityType::MACRO_CALL:
@@ -209,64 +209,64 @@ namespace contractverify
             return false;
 
         case cppast::CppEntityType::COMPOUND:
-            return checkCompound(static_cast<const cppast::CppCompound&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkCompound(static_cast<const cppast::CppCompound&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::VAR:
-            return checkVar(static_cast<const cppast::CppVar&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkVar(static_cast<const cppast::CppVar&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::VAR_LIST:
-            return checkVarList(static_cast<const cppast::CppVarList&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkVarList(static_cast<const cppast::CppVarList&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::USING_NAMESPACE:
-            return checkUsingNamespace(static_cast<const cppast::CppUsingNamespaceDecl&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkUsingNamespace(static_cast<const cppast::CppUsingNamespaceDecl&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::USING_DECL:
-            return checkUsingDecl(static_cast<const cppast::CppUsingDecl&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkUsingDecl(static_cast<const cppast::CppUsingDecl&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::TYPEDEF_DECL:
-            return checkTypedef(static_cast<const cppast::CppTypedefName&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkTypedef(static_cast<const cppast::CppTypedefName&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::TYPEDEF_DECL_LIST:
-            return checkTypedefList(static_cast<const cppast::CppTypedefList&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkTypedefList(static_cast<const cppast::CppTypedefList&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::GOTO_STATEMENT:
-            return checkGotoStatement(static_cast<const cppast::CppGotoStatement&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkGotoStatement(static_cast<const cppast::CppGotoStatement&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::FORWARD_CLASS_DECL:
-            return checkFwdDecl(static_cast<const cppast::CppForwardClassDecl&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkFwdDecl(static_cast<const cppast::CppForwardClassDecl&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::TYPE_CONVERTER:
-            return checkTypeConverter(static_cast<const cppast::CppTypeConverter&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkTypeConverter(static_cast<const cppast::CppTypeConverter&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::FUNCTION:
-            return checkFunction(static_cast<const cppast::CppFunction&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkFunction(static_cast<const cppast::CppFunction&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::LAMBDA:
-            return checkLambda(static_cast<const cppast::CppLambda&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkLambda(static_cast<const cppast::CppLambda&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::EXPRESSION:
-            return checkExpr(static_cast<const cppast::CppExpression&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkExpr(static_cast<const cppast::CppExpression&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::RETURN_STATEMENT:
-            return checkReturn(static_cast<const cppast::CppReturnStatement&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkReturn(static_cast<const cppast::CppReturnStatement&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::IF_BLOCK:
-            return checkIfBlock(static_cast<const cppast::CppIfBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkIfBlock(static_cast<const cppast::CppIfBlock&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::FOR_BLOCK:
-            return checkForBlock(static_cast<const cppast::CppForBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkForBlock(static_cast<const cppast::CppForBlock&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::RANGE_FOR_BLOCK:
-            return checkRangeForBlock(static_cast<const cppast::CppRangeForBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkRangeForBlock(static_cast<const cppast::CppRangeForBlock&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::WHILE_BLOCK:
-            return checkWhileBlock(static_cast<const cppast::CppWhileBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkWhileBlock(static_cast<const cppast::CppWhileBlock&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::DO_WHILE_BLOCK:
-            return checkDoWhileBlock(static_cast<const cppast::CppDoWhileBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkDoWhileBlock(static_cast<const cppast::CppDoWhileBlock&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::SWITCH_BLOCK:
-            return checkSwitchBlock(static_cast<const cppast::CppSwitchBlock&>(entity), stateStructName, scopeStack, additionalScopePrefixes);
+            return checkSwitchBlock(static_cast<const cppast::CppSwitchBlock&>(entity), stateStructName, analysisData);
 
         default:
             // control should never reach here
@@ -277,9 +277,8 @@ namespace contractverify
 
     bool checkCompliance(const cppast::CppCompound& compound, const std::string& stateStructName)
     {
-        std::vector<std::string> additionalScopePrefixes = {}; // will be collected while traversing the AST
-        std::stack<ScopeSpec> scopeStack = {}; // empty scope stack means global scope
-        return checkEntity(compound, stateStructName, scopeStack, additionalScopePrefixes);
+        AnalysisData analysisData;
+        return checkEntity(compound, stateStructName, analysisData);
     }
 
     bool checkCompliance(const cppast::CppCompound& compound)

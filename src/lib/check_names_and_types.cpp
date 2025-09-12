@@ -14,17 +14,20 @@
 
 namespace contractverify
 {
-    bool isInheritanceAllowed(const std::string& baseName, std::vector<std::string>& additionalScopePrefixes)
+    bool isInheritanceAllowed(const std::string& baseName, const std::vector<std::string>& additionalScopePrefixes)
     {
         if (baseName.compare("QpiContext") == 0)
         {
             std::cout << "[ ERROR ] Inheritance from type " << baseName << " is not allowed." << std::endl;
             return false;
         }
+
+        RETURN_IF_FALSE(isScopeResolutionAllowed(baseName, additionalScopePrefixes));
+
         return true;
     }
 
-    bool isNameAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes)
+    bool isNameAllowed(const std::string& name, const std::vector<std::string>& additionalScopePrefixes)
     {
         RETURN_IF_FALSE(isScopeResolutionAllowed(name, additionalScopePrefixes));
 
@@ -43,7 +46,7 @@ namespace contractverify
         return true;
     }
 
-    bool isTypeAllowed(const std::string& type, std::vector<std::string>& additionalScopePrefixes)
+    bool isTypeAllowed(const std::string& type, const std::vector<std::string>& additionalScopePrefixes)
     {
         RETURN_IF_FALSE(isScopeResolutionAllowed(type, additionalScopePrefixes));
 
@@ -76,7 +79,7 @@ namespace contractverify
         return true;
     }
 
-    bool isScopeResolutionAllowed(const std::string& name, std::vector<std::string>& additionalScopePrefixes)
+    bool isScopeResolutionAllowed(const std::string& name, const std::vector<std::string>& additionalScopePrefixes)
     {
         std::size_t pos = name.find("::");
         if (pos != std::string::npos)
@@ -93,9 +96,9 @@ namespace contractverify
         return true;
     }
 
-    bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+    bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, AnalysisData& analysisData)
     {
-        scopeStack.push(ScopeSpec::TEMPL_SPEC);
+        analysisData.scopeStack.push(ScopeSpec::TEMPL_SPEC);
 
         for (const auto& param : params)
         {
@@ -105,7 +108,7 @@ namespace contractverify
                     std::visit(Overloaded{
                             [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
                             {
-                                return checkVarType(*varType, stateStructName, scopeStack, additionalScopePrefixes);
+                                return checkVarType(*varType, stateStructName, analysisData);
                             },
                             [&](const std::unique_ptr<cppast::CppFunctionPointer>& funcPtr) -> bool
                             {
@@ -118,21 +121,21 @@ namespace contractverify
                 );
             }
 
-            RETURN_IF_FALSE(isNameAllowed(param.paramName(), additionalScopePrefixes));
+            RETURN_IF_FALSE(isNameAllowed(param.paramName(), analysisData.additionalScopePrefixes));
 
             RETURN_IF_FALSE(
                 std::visit(Overloaded{
                         [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
                         {
                             if (varType)
-                                return checkVarType(*varType, stateStructName, scopeStack, additionalScopePrefixes);
+                                return checkVarType(*varType, stateStructName, analysisData);
                             else
                                 return true;
                         },
                         [&](const std::unique_ptr<cppast::CppExpression>& expr) -> bool
                         {
                             if (expr)
-                                return checkExpr(*expr, stateStructName, scopeStack, additionalScopePrefixes);
+                                return checkExpr(*expr, stateStructName, analysisData);
                             else
                                 return true;
                         }
@@ -142,36 +145,36 @@ namespace contractverify
             );
         }
 
-        scopeStack.pop();
+        analysisData.scopeStack.pop();
         return true;
     }
 
-    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+    bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, AnalysisData& analysisData)
     {
-        if (scopeStack.empty())
+        if (analysisData.scopeStack.empty())
         {
             std::cout << "[ ERROR ] `typedef` is not allowed in global scope." << std::endl;
             return false;
         }
 
-        scopeStack.push(ScopeSpec::TYPEDEF);
-        RETURN_IF_FALSE(checkVar(*def.var(), stateStructName, scopeStack, additionalScopePrefixes));
-        scopeStack.pop();
+        analysisData.scopeStack.push(ScopeSpec::TYPEDEF);
+        RETURN_IF_FALSE(checkVar(*def.var(), stateStructName, analysisData));
+        analysisData.scopeStack.pop();
 
         return true;
     }
 
-    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, std::stack<ScopeSpec>& scopeStack, std::vector<std::string>& additionalScopePrefixes)
+    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, AnalysisData& analysisData)
     {
-        if (scopeStack.empty())
+        if (analysisData.scopeStack.empty())
         {
             std::cout << "[ ERROR ] `typedef` is not allowed in global scope." << std::endl;
             return false;
         }
 
-        scopeStack.push(ScopeSpec::TYPEDEF);
-        RETURN_IF_FALSE(checkVarList(defList.varList(), stateStructName, scopeStack, additionalScopePrefixes));
-        scopeStack.pop();
+        analysisData.scopeStack.push(ScopeSpec::TYPEDEF);
+        RETURN_IF_FALSE(checkVarList(defList.varList(), stateStructName, analysisData));
+        analysisData.scopeStack.pop();
 
         return true;
     }
