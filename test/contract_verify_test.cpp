@@ -43,21 +43,21 @@ namespace contractverify
 
     class ContractVerifySuccessTest : public testing::TestWithParam<SuccessTestInfo> {};
 
-    TEST(ContractVerifyTest, ParsingWorks) {
+    TEST(ContractVerifyTest, VerifiesFullContract) {
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_ok.h");
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
         ASSERT_NE(ast, nullptr);
 
-        //// TODO: find a "real" contract example that actually works, QUTIL breaks some of the rules, e.g. global constant names
-        //std::string stateStructName = contractverify::findStateStructName(*ast);
-        //EXPECT_EQ(stateStructName, "QUTIL");
-        //EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
+        std::string stateStructName = contractverify::findStateStructName(*ast);
+        EXPECT_EQ(stateStructName, "QUTIL");
+        EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
     }
 
     TEST_P(ContractVerifySuccessTest, PassesComplianceCheck) {
         const SuccessTestInfo& info = GetParam();
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append(info.filename);
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+        ASSERT_NE(ast, nullptr);
 
         std::string stateStructName = contractverify::findStateStructName(*ast);
         EXPECT_EQ(stateStructName, "TESTCON");
@@ -69,6 +69,7 @@ namespace contractverify
         const FailureTestInfo& info = GetParam();
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append(info.filename);
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
+        ASSERT_NE(ast, nullptr);
 
         std::string stateStructName = contractverify::findStateStructName(*ast);
         EXPECT_EQ(stateStructName, "TESTCON");
