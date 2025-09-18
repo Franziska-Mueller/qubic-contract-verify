@@ -165,7 +165,7 @@ namespace contractverify
             if (analysisData.allowedAsIOStruct.top())
             {
                 // add fully scoped struct/class name to the list of additional allowed input/output types
-                analysisData.additionalInputOutputTypes.push_back(analysisData.getFullyScopedName());
+                analysisData.additionalInputOutputTypes.push_back(analysisData.scopeNames);
             }
             else
             {

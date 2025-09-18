@@ -155,6 +155,10 @@ namespace contractverify
             "test_ok_scope_resolution_local_enum.h",
             "ScopeResolutionLocalEnum"
         },
+        {
+            "test_ok_input_output_0.h",
+            "InputOutputTypes0"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -422,6 +426,11 @@ namespace contractverify
             "test_fail_restricted_variable.h",
             "[ ERROR ] Names starting with double underscores are reserved.\n",
             "RestrictedVariable"
+        },
+        {
+            "test_fail_input_output_0.h",
+            "[ ERROR ] SomeFunction_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes0"
         },
     };
 

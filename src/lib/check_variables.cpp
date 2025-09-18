@@ -60,9 +60,25 @@ namespace contractverify
         }
 
         if (varType.compound())
+        {
             RETURN_IF_FALSE(checkEntity(*varType.compound(), stateStructName, analysisData))
+            // TODO: allow to use unnamed structs in IO types?
+            if (analysisData.isDirectlyInClassOrStruct())
+            {
+                analysisData.allowedAsIOStruct.top() = false;
+            }
+        }
         else
+        {
             RETURN_IF_FALSE(isTypeAllowed(varType.baseType(), analysisData.additionalScopePrefixes))
+            if (analysisData.isDirectlyInClassOrStruct())
+            {
+                if (!isTypeAllowedAsIO(varType.baseType(), analysisData))
+                {
+                    analysisData.allowedAsIOStruct.top() = false;
+                }
+            }
+        }
 
         if (varType.typeModifier().ptrLevel_ > 0)
         {

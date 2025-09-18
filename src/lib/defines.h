@@ -20,6 +20,18 @@ namespace contractverify
         TYPEDEF = 6,  // this is needed to distinguish local variables (forbidden) from local typedefs (allowed)
     };
 
+    static std::string getScopedName(const std::vector<std::string>& names, int startIndex = 0)
+    {
+        std::stringstream result;
+        for (int s = startIndex; s < names.size(); ++s)
+        {
+            result << names[s];
+            if (s != names.size() - 1)
+                result << "::";
+        }
+        return result.str();
+    }
+
     struct AnalysisData
     {
         // data that will be collected while traversing the AST
@@ -27,18 +39,11 @@ namespace contractverify
         std::vector<std::string> scopeNames;
         std::stack<bool> allowedAsIOStruct; // this stack tracks whether the struct/class currently being analyzed may be allowed as input/output struct
         std::vector<std::string> additionalScopePrefixes;
-        std::vector<std::string> additionalInputOutputTypes;
+        std::vector<std::vector<std::string>> additionalInputOutputTypes;
 
-        std::string getFullyScopedName() const
+        bool isDirectlyInClassOrStruct() const
         {
-            std::stringstream result;
-            for (int s = 0; s < scopeNames.size(); ++s)
-            {
-                if (s > 0)
-                    result << "::";
-                result << scopeNames[s];
-            }
-            return result.str();
+            return !scopeStack.empty() && (scopeStack.top() == ScopeSpec::CLASS || scopeStack.top() == ScopeSpec::STRUCT);
         }
     };
 

@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iterator>
+#include <regex>
 #include <stack>
 #include <string>
 
@@ -101,6 +103,70 @@ namespace contractverify
         if (name.length() >= 6 && name.compare(name.length() - 6, 6, "_input") == 0)
             return true;
         if (name.length() >= 7 && name.compare(name.length() - 7, 7, "_output") == 0)
+            return true;
+
+        return false;
+    }
+
+    bool isTypeAllowedAsIO(const std::string& type, const AnalysisData& analysisData)
+    {
+        // Assumption: check that the type is allowed has passed, i.e. isTypeAllowed() returned true.
+
+        auto matchesTypename = [&](const std::string& s) -> bool { return type.compare(s) == 0; };
+        if (std::any_of(allowedInputOutputTypes.begin(), allowedInputOutputTypes.end(), matchesTypename))
+            return true;
+
+        // A special case are Array<type, size> and BitArray<size> defined in QPI.
+        // These are allowed (in case of Array only if the element type is allowed).
+        // Note that the size might be specified as name of a constant hence this needs to be considered in the regex.
+        std::regex regexArray("Array<(\\w+),\\s*\\w+>");
+        std::regex regexBitArray("BitArray<\\w+>");
+        std::smatch match;
+        if (std::regex_match(type, match, regexBitArray))
+                return true;
+        if (std::regex_match(type, match, regexArray))
+                return isTypeAllowedAsIO(match[1].str(), analysisData);
+
+        auto matchesScopedTypename = [&](const std::vector<std::string>& s) -> bool 
+            { 
+                /*
+                Example:
+
+                struct SomeContract : public ContractBase
+                {
+                    struct A
+                    {
+                        struct Helper
+                        {
+                            int32 i;
+                        }
+
+                        // additionalInputOutputTypes will already contain: SomeContract::A::Helper
+                        // getFullyScopedName() will return SomeContract::A here
+
+                        Helper h;
+                    }
+
+                    // when analyzing B, additionalInputOutputTypes will already contain: SomeContract::A::Helper, SomeContract::A
+
+                    struct B
+                    {
+                        // getFullyScopedName() will return SomeContract::B here
+
+                        A::Helper ah;
+                    }
+                }
+
+                --> remove common prefix from allowed type and then compare with variable type
+                */
+                auto [itScopedName, itAllowedName] = std::mismatch(analysisData.scopeNames.begin(), analysisData.scopeNames.end(), s.begin(), s.end(), 
+                    [&](const std::string& s1, const std::string& s2) { return s1.compare(s2) == 0; });
+
+                std::string sCommonPrefixRemoved = getScopedName(s, std::distance(s.begin(), itAllowedName));
+
+                return type.compare(sCommonPrefixRemoved) == 0; 
+            };
+        if (std::any_of(analysisData.additionalInputOutputTypes.begin(), analysisData.additionalInputOutputTypes.end(), matchesScopedTypename))
             return true;
 
         return false;
