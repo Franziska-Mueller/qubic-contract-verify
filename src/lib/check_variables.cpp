@@ -117,6 +117,26 @@ namespace contractverify
         RETURN_IF_FALSE(checkVarType(var.varType(), stateStructName, analysisData));
         RETURN_IF_FALSE(checkVarDecl(var.varDecl(), stateStructName, analysisData));
 
+        // typedef can be used to define IO types, e.g. `typedef sint64 SomeFunction_input;`
+        // typedef can also be used to give new names to already allowed types
+        if (!analysisData.scopeStack.empty() && analysisData.scopeStack.top() == ScopeSpec::TYPEDEF)
+        {
+            if (isTypeAllowedAsIO(var.varType().baseType(), analysisData))
+            {
+                std::vector<std::string> scopedName = analysisData.scopeNames;
+                scopedName.push_back(var.varDecl().name());
+                analysisData.additionalInputOutputTypes.push_back(std::move(scopedName));
+            }
+            else
+            {
+                if (isInputOutputType(var.varDecl().name()))
+                {
+                    std::cout << "[ ERROR ] " << var.varDecl().name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 

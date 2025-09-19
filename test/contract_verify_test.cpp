@@ -171,6 +171,18 @@ namespace contractverify
             "test_ok_input_output_3.h",
             "InputOutputTypes3"
         },
+        {
+            "test_ok_input_output_4.h",
+            "InputOutputTypes4"
+        },
+        {
+            "test_ok_input_output_5.h",
+            "InputOutputTypes5"
+        },
+        {
+            "test_ok_input_output_6.h",
+            "InputOutputTypes6"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -468,6 +480,21 @@ namespace contractverify
             "test_fail_input_output_5.h",
             "[ ERROR ] SomeFunction_output is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
             "InputOutputTypes5"
+        },
+        {
+            "test_fail_input_output_6.h",
+            "[ ERROR ] SomeFunction_output is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes6"
+        },
+        {
+            "test_fail_input_output_7.h",
+            "[ ERROR ] Plain arrays are not allowed, use the Array class provided by the QPI instead.\n",
+            "InputOutputTypes7"
+        },
+        {
+            "test_fail_input_output_8.h",
+            "[ ERROR ] Pointers are not allowed.\n",
+            "InputOutputTypes8"
         },
     };
 
