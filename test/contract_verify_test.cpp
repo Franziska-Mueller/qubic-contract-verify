@@ -159,6 +159,18 @@ namespace contractverify
             "test_ok_input_output_0.h",
             "InputOutputTypes0"
         },
+        {
+            "test_ok_input_output_1.h",
+            "InputOutputTypes1"
+        },
+        {
+            "test_ok_input_output_2.h",
+            "InputOutputTypes2"
+        },
+        {
+            "test_ok_input_output_3.h",
+            "InputOutputTypes3"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -429,8 +441,33 @@ namespace contractverify
         },
         {
             "test_fail_input_output_0.h",
-            "[ ERROR ] SomeFunction_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "[ ERROR ] SomeFunction_output is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
             "InputOutputTypes0"
+        },
+        {
+            "test_fail_input_output_1.h",
+            "[ ERROR ] SomeFunction_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes1"
+        },
+        {
+            "test_fail_input_output_2.h",
+            "[ ERROR ] SomeFunction_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes2"
+        },
+        {
+            "test_fail_input_output_3.h",
+            "[ ERROR ] SomeOtherFunction_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes3"
+        },
+        {
+            "test_fail_input_output_4.h",
+            "[ ERROR ] SomeFunction_output is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes4"
+        },
+        {
+            "test_fail_input_output_5.h",
+            "[ ERROR ] SomeFunction_output is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes5"
         },
     };
 

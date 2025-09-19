@@ -62,7 +62,7 @@ namespace contractverify
         if (varType.compound())
         {
             RETURN_IF_FALSE(checkEntity(*varType.compound(), stateStructName, analysisData))
-            // TODO: allow to use unnamed structs in IO types?
+            // unnamed structs as member types are currently not allowed in IO types
             if (analysisData.isDirectlyInClassOrStruct())
             {
                 analysisData.allowedAsIOStruct.top() = false;
@@ -97,8 +97,6 @@ namespace contractverify
 
     bool checkVar(const cppast::CppVar& var, const std::string& stateStructName, AnalysisData& analysisData)
     {
-        // TODO: input and output structs only use basic types
-
         if (!(analysisData.scopeStack.empty() || analysisData.scopeStack.top() == ScopeSpec::STRUCT || analysisData.scopeStack.top() == ScopeSpec::CLASS
             || analysisData.scopeStack.top() == ScopeSpec::FUNC_SIG || analysisData.scopeStack.top() == ScopeSpec::TYPEDEF))
         {
@@ -107,7 +105,14 @@ namespace contractverify
         }
 
         if (var.isTemplated())
+        {
             RETURN_IF_FALSE(checkTemplSpec(var.templateSpecification().value(), stateStructName, analysisData));
+            if (analysisData.isDirectlyInClassOrStruct())
+            {
+                // templated variable is not allowed in IO type
+                analysisData.allowedAsIOStruct.top() = false;
+            }
+        }
 
         RETURN_IF_FALSE(checkVarType(var.varType(), stateStructName, analysisData));
         RETURN_IF_FALSE(checkVarDecl(var.varDecl(), stateStructName, analysisData));
