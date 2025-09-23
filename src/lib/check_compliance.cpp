@@ -120,6 +120,8 @@ namespace contractverify
         }
 
         bool scopeStackPushed = true;
+        bool scopeNamesPushed = false;
+        bool allowedAsIOPushed = false;
         switch (compound.compoundType())
         {
         case cppast::CppCompoundType::STRUCT:
@@ -127,15 +129,25 @@ namespace contractverify
                 RETURN_IF_FALSE(hasStateStructPrefix(compound.name(), stateStructName));
             analysisData.additionalScopePrefixes.push_back(compound.name());
             analysisData.scopeStack.push(ScopeSpec::STRUCT);
+            analysisData.scopeNames.push_back(compound.name());
+            scopeNamesPushed = true;
+            analysisData.allowedAsIOStruct.push(true);
+            allowedAsIOPushed = true;
             break;
         case cppast::CppCompoundType::CLASS:
             if (analysisData.scopeStack.empty()) // global class name has to start with stateStructName
                 RETURN_IF_FALSE(hasStateStructPrefix(compound.name(), stateStructName));
             analysisData.additionalScopePrefixes.push_back(compound.name());
             analysisData.scopeStack.push(ScopeSpec::CLASS);
+            analysisData.scopeNames.push_back(compound.name());
+            scopeNamesPushed = true;
+            analysisData.allowedAsIOStruct.push(true);
+            allowedAsIOPushed = true;
             break;
         case cppast::CppCompoundType::NAMESPACE:
             analysisData.scopeStack.push(ScopeSpec::NAMESPACE);
+            analysisData.scopeNames.push_back(compound.name());
+            scopeNamesPushed = true;
             break;
         case cppast::CppCompoundType::BLOCK:
         case cppast::CppCompoundType::EXTERN_C_BLOCK:
@@ -147,8 +159,29 @@ namespace contractverify
         }
 
         bool checkSucceeded = compound.visitAll([&](const cppast::CppEntity& ent) -> bool { return checkEntity(ent, stateStructName, analysisData); });
+
+        if (allowedAsIOPushed)
+        {
+            if (analysisData.allowedAsIOStruct.top())
+            {
+                // add fully scoped struct/class name to the list of additional allowed input/output types
+                analysisData.additionalInputOutputTypes.push_back(analysisData.scopeNames);
+            }
+            else
+            {
+                // analyzed struct/class is not allowed as input/output type
+                if (isInputOutputType(compound.name()))
+                {
+                    std::cout << "[ ERROR ] " << compound.name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
+                    return false;
+                }
+            }
+            analysisData.allowedAsIOStruct.pop();
+        }
         if (scopeStackPushed)
             analysisData.scopeStack.pop();
+        if (scopeNamesPushed)
+            analysisData.scopeNames.pop_back();
 
         return checkSucceeded;
     }

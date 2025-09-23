@@ -20,6 +20,10 @@ namespace contractverify
 
     bool isScopeResolutionAllowed(const std::string& name, const std::vector<std::string>& additionalScopePrefixes);
 
+    bool isInputOutputType(const std::string& name);
+
+    bool isTypeAllowedAsIO(const std::string& type, const AnalysisData& analysisData);
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, AnalysisData& analysisData);
 
     bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, AnalysisData& analysisData);

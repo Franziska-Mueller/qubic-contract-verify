@@ -1,5 +1,9 @@
 #pragma once
 
+#include <sstream>
+#include <stack>
+#include <vector>
+
 #define RETURN_IF_FALSE(x) { if(!x) return false; } // wrapped in braces to make it work correctly when used inside an `if` block that is followed by `else`
 
 
@@ -16,12 +20,31 @@ namespace contractverify
         TYPEDEF = 6,  // this is needed to distinguish local variables (forbidden) from local typedefs (allowed)
     };
 
+    static std::string getScopedName(const std::vector<std::string>& names, int startIndex = 0)
+    {
+        std::stringstream result;
+        for (int s = startIndex; s < names.size(); ++s)
+        {
+            result << names[s];
+            if (s != names.size() - 1)
+                result << "::";
+        }
+        return result.str();
+    }
+
     struct AnalysisData
     {
         // data that will be collected while traversing the AST
         std::stack<ScopeSpec> scopeStack; // empty scope stack means global scope
+        std::vector<std::string> scopeNames;
+        std::stack<bool> allowedAsIOStruct; // this stack tracks whether the struct/class currently being analyzed may be allowed as input/output struct
         std::vector<std::string> additionalScopePrefixes;
-        std::vector<std::string> additionalInputOutputTypes;
+        std::vector<std::vector<std::string>> additionalInputOutputTypes;
+
+        bool isDirectlyInClassOrStruct() const
+        {
+            return !scopeStack.empty() && (scopeStack.top() == ScopeSpec::CLASS || scopeStack.top() == ScopeSpec::STRUCT);
+        }
     };
 
     // helper struct for visiting variants
@@ -107,5 +130,77 @@ namespace contractverify
     static const std::vector<std::string> allowedInputOutputTypes = {
         // types and structs defined in qpi.h
         "id",
+        "DateAndTime",
+        "Entity",
+        "Asset",
+        "NoData",
+        "ProposalDataV1<true>",
+        "ProposalDataV1<false>",
+        "ProposalSingleVoteDataV1",
+        "ProposalSummarizedVotingDataV1",
+        "ProposalDataYesNo",
+        "PreManagementRightsTransfer_input",
+        "PreManagementRightsTransfer_output",
+        "PostManagementRightsTransfer_input",
+        "PostIncomingTransfer_input",
+        // types defined in other contracts
+        "TESTEXA::QueryQpiFunctions_input",
+        "TESTEXA::QueryQpiFunctions_output",
+        // Simple numeric types
+        "bool",
+        "bit",
+        "sint8",
+        "uint8",
+        "sint16",
+        "uint16",
+        "sint32",
+        "uint32",
+        "sint64",
+        "uint64",
+        "uint128",
+        // BitArray convenience definitions
+        "bit_2",
+        "bit_4",
+        "bit_8",
+        "bit_16",
+        "bit_32",
+        "bit_64",
+        "bit_128",
+        "bit_256",
+        "bit_512",
+        "bit_1024",
+        "bit_2048",
+        "bit_4096",
+        // Array convenience definitions
+        "sint8_2",
+        "sint8_4",
+        "sint8_8",
+        "uint8_2",
+        "uint8_4",
+        "uint8_8",
+        "sint16_2",
+        "sint16_4",
+        "sint16_8",
+        "uint16_2",
+        "uint16_4",
+        "uint16_8",
+        "sint32_2",
+        "sint32_4",
+        "sint32_8",
+        "uint32_2",
+        "uint32_4",
+        "uint32_8",
+        "sint64_2",
+        "sint64_4",
+        "sint64_8",
+        "uint64_2",
+        "uint64_4",
+        "uint64_8",
+        "id_2",
+        "id_4",
+        "id_8",
+
+        // BitArray<SIZE>
+        // Array of allowed type...
     };
 }
