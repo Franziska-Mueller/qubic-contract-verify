@@ -96,6 +96,27 @@ namespace contractverify
         "SELF",
         "SELF_INDEX",
         "STATIC_ASSERT",
+        // shareholder voting macros
+        "DEFINE_SHAREHOLDER_PROPOSAL_STORAGE",
+        "IMPLEMENT_SetShareholderProposal",
+        "IMPLEMENT_GetShareholderProposal",
+        "IMPLEMENT_GetShareholderProposalIndices",
+        "IMPLEMENT_GetShareholderProposalFees",
+        "IMPLEMENT_SetShareholderVotes",
+        "IMPLEMENT_GetShareholderVotes",
+        "IMPLEMENT_GetShareholderVotingResults",
+        "IMPLEMENT_SET_SHAREHOLDER_PROPOSAL",
+        "IMPLEMENT_SET_SHAREHOLDER_VOTES",
+        "IMPLEMENT_FinalizeShareholderStateVarProposals",
+        "IMPLEMENT_DEFAULT_SHAREHOLDER_PROPOSAL_VOTING",
+        "REGISTER_SHAREHOLDER_PROPSAL_VOTING",
+        "REGISTER_GetShareholderProposalFees",
+        "REGISTER_GetShareholderProposalIndices",
+        "REGISTER_GetShareholderProposal",
+        "REGISTER_GetShareholderVotes",
+        "REGISTER_GetShareholderVotingResults",
+        "REGISTER_SetShareholderProposal",
+        "REGISTER_SetShareholderVotes",
     };
 
     static const std::vector<std::string> allowedScopePrefixes = {
