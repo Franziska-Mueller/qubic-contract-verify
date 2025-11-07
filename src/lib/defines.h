@@ -78,6 +78,8 @@ namespace contractverify
         "LOG_ERROR",
         "LOG_INFO",
         "LOG_WARNING",
+        "LOG_PAUSE",
+        "LOG_RESUME",
         "PRIVATE_FUNCTION",
         "PRIVATE_FUNCTION_WITH_LOCALS",
         "PRIVATE_PROCEDURE",
