@@ -148,6 +148,9 @@ namespace contractverify
         "QDRAW",
         "TESTEXA",
         "TESTEXB",
+        "RL",
+        "QRP",
+        "QTF",
     };
 
     static const std::vector<std::string> allowedInputOutputTypes = {
