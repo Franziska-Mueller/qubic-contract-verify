@@ -146,11 +146,16 @@ namespace contractverify
         "QSWAP",
         "NOST",
         "QDRAW",
+        "RL",
+        "QBOND",
+        "QIP",
+        "QRAFFLE",
         "TESTEXA",
         "TESTEXB",
-        "RL",
         "QRP",
         "QTF",
+        "QDUEL",
+        "QRWA",
     };
 
     static const std::vector<std::string> allowedInputOutputTypes = {
