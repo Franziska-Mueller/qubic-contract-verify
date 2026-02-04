@@ -48,14 +48,22 @@ namespace contractverify
 
     bool checkVarType(const cppast::CppVarType& varType, const std::string& stateStructName, AnalysisData& analysisData)
     {
-        // if global scope this has to be const or constexpr
+        // if global scope this has to be constexpr, const is not properly initialized in UEFI
+        // global variables are not allowed at all
         if (analysisData.scopeStack.empty())
         {
-            const auto attr = varType.typeAttr() | (IsConst(varType) ? cppast::CppIdentifierAttrib::CONST : 0);
-            if (!(attr & cppast::CppIdentifierAttrib::CONST || attr & cppast::CppIdentifierAttrib::CONST_EXPR))
+            if (!(varType.typeAttr() & cppast::CppIdentifierAttrib::CONST_EXPR))
             {
-                std::cout << "[ ERROR ] Global variables are not allowed. You may use global constants (const/constexpr)." << std::endl;
-                return false;
+                if (IsConst(varType))
+                {
+                    std::cout << "[ ERROR ] Global constants are only allowed as constexpr (due to a limitation in UEFI with initialization of const globals)." << std::endl;
+                    return false;
+                }
+                else
+                {
+                    std::cout << "[ ERROR ] Global variables are not allowed. You may use global constants (constexpr only)." << std::endl;
+                    return false;
+                }
             }
         }
 
