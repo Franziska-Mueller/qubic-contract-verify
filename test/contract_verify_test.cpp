@@ -222,6 +222,11 @@ namespace contractverify
             "CharLiteral"
         },
         {
+            "test_fail_float_literal.h",
+            "[ ERROR ] Floating point literals are not allowed, found 0.5.\n",
+            "FloatLiteral"
+        },
+        {
             "test_fail_pointer_dereferencing.h",
             "[ ERROR ] Pointer dereferencing (unary operator `*`) is not allowed.\n",
             "PointerDereferencing"

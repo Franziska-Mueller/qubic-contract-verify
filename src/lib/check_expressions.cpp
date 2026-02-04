@@ -30,7 +30,17 @@ namespace contractverify
                     << static_cast<const cppast::CppCharLiteralExpr&>(expr).value() << "." << std::endl;
                 return false;
             case cppast::CppAtomicExprType::NUMBER_LITEREL:
-                return true;
+            {
+                const std::string& val = static_cast<const cppast::CppNumberLiteralExpr&>(expr).value();
+                // check if the number literal is floating point (-> not allowed!)
+                if (val.find('.') != std::string::npos)
+                {
+                    std::cout << "[ ERROR ] Floating point literals are not allowed, found " << val << "." << std::endl;
+                    return false;
+                }
+                else
+                    return true;
+            }
             case cppast::CppAtomicExprType::NAME:
                 return isNameAllowed((static_cast<const cppast::CppNameExpr&>(expr)).value(), analysisData.additionalScopePrefixes);
             case cppast::CppAtomicExprType::VARTYPE:
