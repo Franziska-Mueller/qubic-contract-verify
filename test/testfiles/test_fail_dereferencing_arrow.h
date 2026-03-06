@@ -3,5 +3,8 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    int dummy = someGlobalPtr->giveInt();
+    struct StateData
+    {
+        int dummy = someGlobalPtr->giveInt();
+    };
 };

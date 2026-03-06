@@ -112,6 +112,16 @@ namespace contractverify
             return false;
         }
 
+        // Variables directly in the state struct must be in a nested struct (e.g., StateData)
+        if (!analysisData.scopeStack.empty()
+            && (analysisData.scopeStack.top() == ScopeSpec::STRUCT || analysisData.scopeStack.top() == ScopeSpec::CLASS)
+            && analysisData.scopeNames.size() == 1
+            && analysisData.scopeNames[0] == stateStructName)
+        {
+            std::cout << "[ ERROR ] Variable declarations are not allowed directly in the state struct. Use the nested struct StateData for state variables." << std::endl;
+            return false;
+        }
+
         if (var.isTemplated())
         {
             RETURN_IF_FALSE(checkTemplSpec(var.templateSpecification().value(), stateStructName, analysisData));

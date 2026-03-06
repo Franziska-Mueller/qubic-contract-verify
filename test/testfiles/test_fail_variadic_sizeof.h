@@ -3,5 +3,8 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    auto dummy = sizeof...(somePack);
+    struct StateData
+    {
+        auto dummy = sizeof...(somePack);
+    };
 };
