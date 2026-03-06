@@ -2,5 +2,8 @@ using namespace QPI;
 
 struct TESTCON : public ContractBase
 {
-    float f;
+    struct StateData
+    {
+        float f;
+    };
 };

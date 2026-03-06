@@ -183,6 +183,10 @@ namespace contractverify
             "test_ok_input_output_6.h",
             "InputOutputTypes6"
         },
+        {
+            "test_ok_state_data.h",
+            "StateData"
+        },
     };
 
     FailureTestInfo failureTestInfos[] = {
@@ -505,6 +509,11 @@ namespace contractverify
             "test_fail_input_output_8.h",
             "[ ERROR ] Pointers are not allowed.\n",
             "InputOutputTypes8"
+        },
+        {
+            "test_fail_state_struct_variable.h",
+            "[ ERROR ] Variable declarations are not allowed directly in the state struct. Use the nested struct StateData for state variables.\n",
+            "StateStructVariable"
         },
     };
 

@@ -1,10 +1,8 @@
 using namespace QPI;
-
 struct TESTCON : public ContractBase
 {
-public:
     struct StateData
     {
-        SomeStruct dummy = {1, 2, 3};
+        uint64 someVar;
     };
 };

@@ -101,24 +101,27 @@ struct QUTIL2
 struct QUTIL : public ContractBase
 {
 private:
-    // registers, logger and other buffer
-    sint32 _i0, _i1, _i2, _i3;
-    sint64 _i64_0, _i64_1, _i64_2, _i64_3;
-    uint64 _r0, _r1, _r2, _r3;
-    sint64 total;
+    struct StateData
+    {
+        // registers, logger and other buffer
+        sint32 _i0, _i1, _i2, _i3;
+        sint64 _i64_0, _i64_1, _i64_2, _i64_3;
+        uint64 _r0, _r1, _r2, _r3;
+        sint64 total;
 
-    // Voting state
-    Array<QUTILPoll, QUTIL_MAX_POLL> polls;
-    Array<QUTILVoter, QUTIL_TOTAL_VOTERS> voters; // 1d array for all voters
-    Array<uint64, QUTIL_MAX_POLL> poll_ids;
-    Array<uint64, QUTIL_MAX_POLL> voter_counts; // tracks number of voters per poll
-    Array<Array<uint8, QUTIL_POLL_GITHUB_URL_MAX_SIZE>, QUTIL_MAX_POLL> poll_links; // github links for polls
-    uint64 current_poll_id;
-    uint64 new_polls_this_epoch;
+        // Voting state
+        Array<QUTILPoll, QUTIL_MAX_POLL> polls;
+        Array<QUTILVoter, QUTIL_TOTAL_VOTERS> voters; // 1d array for all voters
+        Array<uint64, QUTIL_MAX_POLL> poll_ids;
+        Array<uint64, QUTIL_MAX_POLL> voter_counts; // tracks number of voters per poll
+        Array<Array<uint8, QUTIL_POLL_GITHUB_URL_MAX_SIZE>, QUTIL_MAX_POLL> poll_links; // github links for polls
+        uint64 current_poll_id;
+        uint64 new_polls_this_epoch;
 
-    // DF function variables
-    m256i dfMiningSeed;
-    m256i dfCurrentState;
+        // DF function variables
+        m256i dfMiningSeed;
+        m256i dfCurrentState;
+    };
 
     // Get Qubic Balance
     struct get_qubic_balance_input {
