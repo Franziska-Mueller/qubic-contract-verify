@@ -1,4 +1,7 @@
 struct TESTCON : public ContractBase
 {
-    myNumbers::MyInt i;
+    struct StateData
+    {
+        myNumbers::MyInt i;
+    };
 };
