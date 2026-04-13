@@ -465,6 +465,11 @@ namespace contractverify
             "ScopedInheritance"
         },
         {
+            "test_fail_scope_resolution_template.h",
+            "[ ERROR ] Scope resolution with prefix NotAllowed is not allowed.\n",
+            "ScopedTemplateParameter"
+        },
+        {
             "test_fail_restricted_function_call.h",
             "[ ERROR ] Names starting with double underscores are reserved.\n",
             "RestrictedFunctionCall"

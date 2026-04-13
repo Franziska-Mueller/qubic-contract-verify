@@ -83,18 +83,91 @@ namespace contractverify
 
     bool isScopeResolutionAllowed(const std::string& name, const std::vector<std::string>& additionalScopePrefixes)
     {
-        std::size_t pos = name.find("::");
-        if (pos != std::string::npos)
+        // Sometimes the scope resolution operator appears inside of brackets, for example Z<x::y, a::b>.
+        // In these cases, only check the substring between the last opening bracket or comma and the scope resolution operator.
+        // ASSUMPTION: The given text is syntactically correct, i.e. brackets are properly nested.
+        // Note: For names with multiple scope resolution operators like a::b::c, only the outermost prefix (a) is validated.
+
+        std::stack<std::size_t> openingPositions;  // Stack to track all opening bracket/parenthesis positions
+        std::stack<std::size_t> relevantPositions;  // Stack to track lastRelevantPos for each nesting level
+        std::stack<bool> foundScopeResolutions;  // Stack to track foundScopeResolution for each nesting level
+        std::size_t lastRelevantPos = 0;  // Track position after last opening bracket or comma
+        bool foundScopeResolution = false;  // Track if we've found any :: in current context
+
+        for (std::size_t pos = 0; pos < name.length(); ++pos)
         {
-            std::string prefix = name.substr(0, pos);
-            auto matchesPrefix = [&](const std::string& s) -> bool { return prefix.compare(s) == 0; };
-            if (std::any_of(allowedScopePrefixes.begin(), allowedScopePrefixes.end(), matchesPrefix))
-                return true;
-            if (std::any_of(additionalScopePrefixes.begin(), additionalScopePrefixes.end(), matchesPrefix))
-                return true;
-            std::cout << "[ ERROR ] Scope resolution with prefix " << prefix << " is not allowed." << std::endl;
-            return false;
+            if (name[pos] == '(' || name[pos] == '<')
+            {
+                openingPositions.push(pos + 1);
+                relevantPositions.push(lastRelevantPos);
+                foundScopeResolutions.push(foundScopeResolution);
+                lastRelevantPos = pos + 1;
+                foundScopeResolution = false;  // Reset for new nesting level
+            }
+            else if (name[pos] == ')' || name[pos] == '>')
+            {
+                if (!openingPositions.empty())
+                {
+                    openingPositions.pop();
+                    if (!relevantPositions.empty())
+                    {
+                        lastRelevantPos = relevantPositions.top();
+                        relevantPositions.pop();
+                    }
+                    if (!foundScopeResolutions.empty())
+                    {
+                        foundScopeResolution = foundScopeResolutions.top();
+                        foundScopeResolutions.pop();
+                    }
+                }
+            }
+            else if (name[pos] == ',' && !openingPositions.empty())
+            {
+                // Update lastRelevantPos to position after the comma (skip whitespace)
+                lastRelevantPos = pos + 1;
+                // Skip any whitespace after comma
+                while (lastRelevantPos < name.length() && name[lastRelevantPos] == ' ')
+                {
+                    lastRelevantPos++;
+                }
+                foundScopeResolution = false;  // Reset for new parameter
+            }
+            else if (pos + 1 < name.length() && name[pos] == ':' && name[pos + 1] == ':' && !foundScopeResolution)
+            {
+                // Found first :: in current context - extract the outermost prefix
+                std::string prefix;
+
+                if (!openingPositions.empty())
+                {
+                    // Inside brackets/parentheses: prefix starts after last opening bracket/parenthesis or comma
+                    prefix = name.substr(lastRelevantPos, pos - lastRelevantPos);
+                }
+                else
+                {
+                    // Outside brackets/parentheses: prefix starts from beginning
+                    prefix = name.substr(0, pos);
+                }
+
+                auto matchesPrefix = [&](const std::string& s) -> bool { return prefix.compare(s) == 0; };
+                if (std::any_of(allowedScopePrefixes.begin(), allowedScopePrefixes.end(), matchesPrefix))
+                {
+                    // Valid prefix found, mark that we've validated this context
+                    foundScopeResolution = true;
+                    ++pos;  // Skip the second ':'
+                    continue;
+                }
+                if (std::any_of(additionalScopePrefixes.begin(), additionalScopePrefixes.end(), matchesPrefix))
+                {
+                    // Valid prefix found, mark that we've validated this context
+                    foundScopeResolution = true;
+                    ++pos;  // Skip the second ':'
+                    continue;
+                }
+                std::cout << "[ ERROR ] Scope resolution with prefix " << prefix << " is not allowed." << std::endl;
+                return false;
+            }
         }
+
         return true;
     }
 
@@ -130,8 +203,8 @@ namespace contractverify
         // Another special case are oracle related types:
         // - OI::*::OracleQuery
         // - OracleNotificationInput<*>
-        std::regex regexOracleQuery("OI::(\\w+)::OracleQuery");
-        std::regex regexOracleNotificationInput("OracleNotificationInput<\\w+>");
+        std::regex regexOracleQuery("OI::\\w+::OracleQuery");
+        std::regex regexOracleNotificationInput("OracleNotificationInput<(\\w+)(:\\:\\w+)*>");
         if (std::regex_match(type, match, regexOracleQuery) || std::regex_match(type, match, regexOracleNotificationInput))
             return true;
 
