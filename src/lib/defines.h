@@ -91,6 +91,7 @@ namespace contractverify
         "REGISTER_USER_FUNCTIONS_AND_PROCEDURES",
         "REGISTER_USER_FUNCTION",
         "REGISTER_USER_PROCEDURE",
+        "REGISTER_USER_PROCEDURE_NOTIFICATION",
         "CALL",
         "CALL_OTHER_CONTRACT_FUNCTION",
         "INVOKE_OTHER_CONTRACT_PROCEDURE",
@@ -130,6 +131,8 @@ namespace contractverify
         "AssetIssuanceSelect",
         "AssetOwnershipSelect",
         "AssetPossessionSelect",
+        // oracles
+        "OI",
         // other contract names
         "QX",
         "QUOTTERY",
@@ -233,5 +236,7 @@ namespace contractverify
 
         // BitArray<SIZE>
         // Array of allowed type...
+        // OI::*::OracleQuery
+        // OracleNotificationInput<*>
     };
 }

@@ -127,6 +127,14 @@ namespace contractverify
         if (std::regex_match(type, match, regexArray))
                 return isTypeAllowedAsIO(match[1].str(), analysisData);
 
+        // Another special case are oracle related types:
+        // - OI::*::OracleQuery
+        // - OracleNotificationInput<*>
+        std::regex regexOracleQuery("OI::(\\w+)::OracleQuery");
+        std::regex regexOracleNotificationInput("OracleNotificationInput<\\w+>");
+        if (std::regex_match(type, match, regexOracleQuery) || std::regex_match(type, match, regexOracleNotificationInput))
+            return true;
+
         auto matchesScopedTypename = [&](const std::vector<std::string>& s) -> bool 
             { 
                 /*

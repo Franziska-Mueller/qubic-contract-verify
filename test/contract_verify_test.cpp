@@ -43,7 +43,8 @@ namespace contractverify
 
     class ContractVerifySuccessTest : public testing::TestWithParam<SuccessTestInfo> {};
 
-    TEST(ContractVerifyTest, VerifiesFullContract) {
+    TEST(ContractVerifyTest, VerifiesFullContract)
+    {
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append("test_ok.h");
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
         ASSERT_NE(ast, nullptr);
@@ -53,7 +54,8 @@ namespace contractverify
         EXPECT_EQ(contractverify::checkCompliance(*ast, stateStructName), true);
     }
 
-    TEST_P(ContractVerifySuccessTest, PassesComplianceCheck) {
+    TEST_P(ContractVerifySuccessTest, PassesComplianceCheck)
+    {
         const SuccessTestInfo& info = GetParam();
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append(info.filename);
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
@@ -65,7 +67,8 @@ namespace contractverify
         EXPECT_TRUE(contractverify::checkCompliance(*ast, stateStructName));
     }
 
-    TEST_P(ContractVerifyFailureTest, FailsWithExpectedError) {
+    TEST_P(ContractVerifyFailureTest, FailsWithExpectedError)
+    {
         const FailureTestInfo& info = GetParam();
         std::filesystem::path filepath = std::filesystem::path(testfiles::baseDir).append(info.filename);
         std::unique_ptr<cppast::CppCompound> ast = contractverify::parseAST(filepath.string());
@@ -78,7 +81,8 @@ namespace contractverify
         EXPECT_THAT(customBuffer.str(), testing::StrEq(info.expectedErrorMessage));
     }
 
-    SuccessTestInfo successTestInfos[] = {
+    SuccessTestInfo successTestInfos[] =
+    {
         {
             "test_ok_function_call.h",
             "FunctionCall"
@@ -187,9 +191,14 @@ namespace contractverify
             "test_ok_state_data.h",
             "StateData"
         },
+        {
+            "test_ok_oracles.h",
+            "Oracles"
+        },
     };
 
-    FailureTestInfo failureTestInfos[] = {
+    FailureTestInfo failureTestInfos[] =
+    {
         {
             "test_fail_variadic_argument.h",
             "[ ERROR ] Variadic arguments are not allowed.\n",
