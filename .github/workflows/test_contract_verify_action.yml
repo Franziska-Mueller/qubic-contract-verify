@@ -10,6 +10,8 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: 'true'
       - name: Contract verify action step
         uses: ./ # Uses an action in the root directory
         id: verify
