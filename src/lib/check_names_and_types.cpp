@@ -202,10 +202,14 @@ namespace contractverify
 
         // Another special case are oracle related types:
         // - OI::*::OracleQuery
-        // - OracleNotificationInput<*>
+        // - OI::*::OracleReply
+        // - OracleNotificationInput<OI::*>
         std::regex regexOracleQuery("OI::\\w+::OracleQuery");
-        std::regex regexOracleNotificationInput("OracleNotificationInput<(\\w+)(:\\:\\w+)*>");
-        if (std::regex_match(type, match, regexOracleQuery) || std::regex_match(type, match, regexOracleNotificationInput))
+        std::regex regexOracleReply("OI::\\w+::OracleReply");
+        std::regex regexOracleNotificationInput("OracleNotificationInput<OI::\\w+>");
+        if (std::regex_match(type, match, regexOracleQuery)
+            || std::regex_match(type, match, regexOracleReply)
+            || std::regex_match(type, match, regexOracleNotificationInput))
             return true;
 
         auto matchesScopedTypename = [&](const std::vector<std::string>& s) -> bool 

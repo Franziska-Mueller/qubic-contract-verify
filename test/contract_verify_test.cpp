@@ -529,6 +529,11 @@ namespace contractverify
             "[ ERROR ] Variable declarations are not allowed directly in the state struct. Use the nested struct StateData for state variables.\n",
             "StateStructVariable"
         },
+        {
+            "test_fail_oracle_notification_input.h",
+            "[ ERROR ] NotifyPriceOracleReply_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "OracleNotificationInput"
+        },
     };
 
     INSTANTIATE_TEST_SUITE_P(CVST,

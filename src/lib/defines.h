@@ -239,6 +239,7 @@ namespace contractverify
         // BitArray<SIZE>
         // Array of allowed type...
         // OI::*::OracleQuery
+        // OI::*::OracleReply
         // OracleNotificationInput<*>
     };
 }
