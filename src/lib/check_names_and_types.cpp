@@ -6,6 +6,7 @@
 #include <regex>
 #include <stack>
 #include <string>
+#include <cctype>
 
 #include <cppparser/cppparser.h>
 
@@ -16,8 +17,11 @@
 
 namespace contractverify
 {
-    bool isInheritanceAllowed(const std::string& baseName, const std::vector<std::string>& additionalScopePrefixes)
+    bool isInheritanceAllowed(std::string baseName, const std::vector<std::string>& additionalScopePrefixes)
     {
+        // First remove all whitespace to simplify the parsing logic
+        std::erase_if(baseName, [](unsigned char c) { return std::isspace(c); });
+
         if (baseName.compare("QpiContext") == 0)
         {
             std::cout << "[ ERROR ] Inheritance from type " << baseName << " is not allowed." << std::endl;
@@ -29,8 +33,11 @@ namespace contractverify
         return true;
     }
 
-    bool isNameAllowed(const std::string& name, const std::vector<std::string>& additionalScopePrefixes)
+    bool isNameAllowed(std::string name, const std::vector<std::string>& additionalScopePrefixes)
     {
+        // First remove all whitespace to simplify the parsing logic
+        std::erase_if(name, [](unsigned char c) { return std::isspace(c); });
+
         RETURN_IF_FALSE(isScopeResolutionAllowed(name, additionalScopePrefixes));
 
         // names starting with double underscores are reserved for internal functions and compiler macros
@@ -48,8 +55,11 @@ namespace contractverify
         return true;
     }
 
-    bool isTypeAllowed(const std::string& type, const std::vector<std::string>& additionalScopePrefixes)
+    bool isTypeAllowed(std::string type, const std::vector<std::string>& additionalScopePrefixes)
     {
+        // First remove all whitespace to simplify the parsing logic
+        std::erase_if(type, [](unsigned char c) { return std::isspace(c); });
+
         RETURN_IF_FALSE(isScopeResolutionAllowed(type, additionalScopePrefixes));
 
         if (type.length() >= 3 && type.compare(type.length() - 3, 3, "...") == 0)
@@ -81,7 +91,7 @@ namespace contractverify
         return true;
     }
 
-    bool isScopeResolutionAllowed(const std::string& name, const std::vector<std::string>& additionalScopePrefixes)
+    bool isScopeResolutionAllowed(std::string name, const std::vector<std::string>& additionalScopePrefixes)
     {
         // Sometimes the scope resolution operator appears inside of brackets, for example Z<x::y, a::b>.
         // In these cases, only check the substring between the last opening bracket or comma and the scope resolution operator.
@@ -93,6 +103,9 @@ namespace contractverify
         std::stack<bool> foundScopeResolutions;  // Stack to track foundScopeResolution for each nesting level
         std::size_t lastRelevantPos = 0;  // Track position after last opening bracket or comma
         bool foundScopeResolution = false;  // Track if we've found any :: in current context
+
+        // First remove all whitespace from name to simplify the parsing logic
+        std::erase_if(name, [](unsigned char c) { return std::isspace(c); });
 
         for (std::size_t pos = 0; pos < name.length(); ++pos)
         {
@@ -123,13 +136,8 @@ namespace contractverify
             }
             else if (name[pos] == ',' && !openingPositions.empty())
             {
-                // Update lastRelevantPos to position after the comma (skip whitespace)
+                // Update lastRelevantPos to position after the comma
                 lastRelevantPos = pos + 1;
-                // Skip any whitespace after comma
-                while (lastRelevantPos < name.length() && name[lastRelevantPos] == ' ')
-                {
-                    lastRelevantPos++;
-                }
                 foundScopeResolution = false;  // Reset for new parameter
             }
             else if (pos + 1 < name.length() && name[pos] == ':' && name[pos + 1] == ':' && !foundScopeResolution)
@@ -171,8 +179,11 @@ namespace contractverify
         return true;
     }
 
-    bool isInputOutputType(const std::string& name)
+    bool isInputOutputType(std::string name)
     {
+        // First remove all whitespace
+        std::erase_if(name, [](unsigned char c) { return std::isspace(c); });
+
         if (name.length() >= 6 && name.compare(name.length() - 6, 6, "_input") == 0)
             return true;
         if (name.length() >= 7 && name.compare(name.length() - 7, 7, "_output") == 0)
@@ -181,9 +192,12 @@ namespace contractverify
         return false;
     }
 
-    bool isTypeAllowedAsIO(const std::string& type, const AnalysisData& analysisData)
+    bool isTypeAllowedAsIO(std::string type, const AnalysisData& analysisData)
     {
         // Assumption: check that the type is allowed has passed, i.e. isTypeAllowed() returned true.
+
+        // First remove all whitespace from name to simplify the parsing logic
+        std::erase_if(type, [](unsigned char c) { return std::isspace(c); });
 
         auto matchesTypename = [&](const std::string& s) -> bool { return type.compare(s) == 0; };
         if (std::any_of(allowedInputOutputTypes.begin(), allowedInputOutputTypes.end(), matchesTypename))

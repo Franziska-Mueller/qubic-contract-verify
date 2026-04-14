@@ -74,7 +74,7 @@ struct TESTCON : public ContractBase
         output.success = qpi.unsubscribeOracle(input.subscriptionId);
     }
 
-    typedef OracleNotificationInput<OI::Price> NotifyPriceOracleReply_input;
+    typedef OracleNotificationInput <  OI::Price > NotifyPriceOracleReply_input;
     typedef NoData NotifyPriceOracleReply_output;
     struct NotifyPriceOracleReply_locals
     {
