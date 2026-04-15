@@ -11,6 +11,7 @@ inputs:
     default: ''
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://ghcr.io/franziska-mueller/qubic-contract-verify:latest'
   args:
     - ${{ inputs.filepaths }}
+    
