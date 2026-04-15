@@ -3,18 +3,16 @@ FROM gcc:latest
 
 # Install cmake and git (git is needed for submodules)
 RUN apt-get update && \
-    apt-get install -y cmake flex clang-tidy git && \
+    apt-get install -y cmake flex clang-tidy && \
     rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /contract-verify
 
-# Copy the entire project first (needed for .gitmodules and context)
-COPY . .
-
-# Initialize and update submodules
-# This will populate /contract-verify/deps/CppParser
-RUN git submodule update --init --recursive
+# Copy source code and cmake files
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+COPY deps/ ./deps/
 
 # Build CppParser dependency
 RUN cd deps/CppParser && \
