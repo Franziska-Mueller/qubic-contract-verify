@@ -94,10 +94,13 @@ namespace contractverify
         "CALL",
         "CALL_OTHER_CONTRACT_FUNCTION",
         "INVOKE_OTHER_CONTRACT_PROCEDURE",
-        "QUERY_ORACLE",
         "SELF",
         "SELF_INDEX",
         "STATIC_ASSERT",
+        // oracle macros
+        // "QUERY_ORACLE", -- due to a parser bug with macro parsing, it is better to not add this and let the parser treat it as function name
+        // "SUBSCRIBE_ORACLE", -- due to a parser bug with macro parsing, it is better to not add this and let the parser treat it as function name
+        "REGISTER_USER_PROCEDURE_NOTIFICATION",
         // shareholder voting macros
         "DEFINE_SHAREHOLDER_PROPOSAL_STORAGE",
         "IMPLEMENT_SetShareholderProposal",
@@ -130,6 +133,8 @@ namespace contractverify
         "AssetIssuanceSelect",
         "AssetOwnershipSelect",
         "AssetPossessionSelect",
+        // oracles
+        "OI",
         // other contract names
         "QX",
         "QUOTTERY",
@@ -233,5 +238,8 @@ namespace contractverify
 
         // BitArray<SIZE>
         // Array of allowed type...
+        // OI::*::OracleQuery
+        // OI::*::OracleReply
+        // OracleNotificationInput<*>
     };
 }

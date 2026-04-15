@@ -1,0 +1,3 @@
+[submodule "deps/CppParser"]
+	path = deps/CppParser
+	url = git@github.com:satya-das/cppparser.git
