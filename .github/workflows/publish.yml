@@ -1,0 +1,32 @@
+name: Publish Action
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: 'true'
+          # Note: Username/Repo must be lowercase for GHCR
+          tags: |
+            ghcr.io/franziska-mueller/qubic-contract-verify:latest
+            ghcr.io/franziska-mueller/qubic-contract-verify:${{ github.ref_name }}
