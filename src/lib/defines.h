@@ -182,6 +182,7 @@ namespace contractverify
         // types defined in other contracts
         "TESTEXA::QueryQpiFunctions_input",
         "TESTEXA::QueryQpiFunctions_output",
+        "AuctionData",
         // Simple numeric types
         "bool",
         "bit",
