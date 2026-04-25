@@ -195,6 +195,10 @@ namespace contractverify
             "test_ok_oracles.h",
             "Oracles"
         },
+        {
+            "test_ok_input_output_enum_class_uint8.h",
+            "InputOutputEnumClassUint8"
+        },
     };
 
     FailureTestInfo failureTestInfos[] =
