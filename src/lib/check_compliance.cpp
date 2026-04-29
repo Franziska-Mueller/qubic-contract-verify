@@ -93,6 +93,25 @@ namespace contractverify
                 RETURN_IF_FALSE(checkTemplSpec(fwdDecl.templateSpecification().value(), stateStructName, analysisData));
             return true;
         }
+    
+        bool checkEnum(const cppast::CppEnum& enumDecl, AnalysisData& analysisData)
+        {
+            analysisData.additionalScopePrefixes.push_back(enumDecl.name());
+
+            if (!enumDecl.name().empty() && !enumDecl.underlyingType().empty())
+            {
+                RETURN_IF_FALSE(isTypeAllowed(enumDecl.underlyingType(), analysisData.additionalScopePrefixes));
+
+                if (isTypeAllowedAsIO(enumDecl.underlyingType(), analysisData))
+                {
+                    std::vector<std::string> scopedName = analysisData.scopeNames;
+                    scopedName.push_back(enumDecl.name());
+                    analysisData.additionalInputOutputTypes.push_back(std::move(scopedName));
+                }
+            }
+
+            return true;
+        }
 
     }  // namespace
 
@@ -198,8 +217,7 @@ namespace contractverify
             return true;
 
         case cppast::CppEntityType::ENUM:
-            analysisData.additionalScopePrefixes.push_back(static_cast<const cppast::CppEnum&>(entity).name());
-            return true;
+            return checkEnum(static_cast<const cppast::CppEnum&>(entity), analysisData);
 
         case cppast::CppEntityType::MACRO_CALL:
             // macro arguments? but we are anyways restricted to the known macros
