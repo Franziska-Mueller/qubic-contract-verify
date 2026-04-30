@@ -57,6 +57,7 @@ namespace contractverify
                 std::visit(Overloaded{ 
                         [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
                         {
+                            bool allowedAsIO = false;
                             if (varType)
                             {
                                 RETURN_IF_FALSE(checkVarType(*varType, stateStructName, analysisData));
@@ -65,16 +66,16 @@ namespace contractverify
                                     std::vector<std::string> scopedName = analysisData.scopeNames;
                                     scopedName.push_back(decl.name());
                                     analysisData.additionalInputOutputTypes.push_back(std::move(scopedName));
-                                }
-                                else
-                                {
-                                    if (isInputOutputType(decl.name()))
-                                    {
-                                        std::cout << "[ ERROR ] " << decl.name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
-                                        return false;
-                                    }
+                                    allowedAsIO = true;
                                 }
                             }
+
+                            if (!allowedAsIO && isInputOutputType(decl.name()))
+                            {
+                                std::cout << "[ ERROR ] " << decl.name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
+                                return false;
+                            }
+
                             return true;
                         },
                         [&](const std::unique_ptr<cppast::CppFunctionPointer>& funcPtr) -> bool
@@ -88,12 +89,18 @@ namespace contractverify
                         },
                         [&](const std::unique_ptr<cppast::CppCompound>& compound) -> bool
                         {
+                            // For ease of analysis, defining a compound type as IO type via a using declaration is not allowed.
+                            if (isInputOutputType(decl.name()))
+                            {
+                                std::cout << "[ ERROR ] " << decl.name() << " is not allowed as input/output type. For ease of analysis, defining a compound type as IO type via a using declaration is forbidden." << std::endl;
+                                return false;
+                            }
                             if (compound)
                             {
                                 return checkCompound(*compound, stateStructName, analysisData);
                             }
                             return true;
-                        } 
+                        }
                     },
                     decl.definition()
                 )
