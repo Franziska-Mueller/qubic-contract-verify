@@ -52,13 +52,28 @@ namespace contractverify
 
             RETURN_IF_FALSE(isScopeResolutionAllowed(decl.name(), analysisData.additionalScopePrefixes));
 
+            analysisData.scopeStack.push(ScopeSpec::USING_DECL);
             RETURN_IF_FALSE(
                 std::visit(Overloaded{ 
                         [&](const std::unique_ptr<cppast::CppVarType>& varType) -> bool
                         {
                             if (varType)
                             {
-                                return checkVarType(*varType, stateStructName, analysisData);
+                                RETURN_IF_FALSE(checkVarType(*varType, stateStructName, analysisData));
+                                if (isTypeAllowedAsIO(varType->baseType(), analysisData))
+                                {
+                                    std::vector<std::string> scopedName = analysisData.scopeNames;
+                                    scopedName.push_back(decl.name());
+                                    analysisData.additionalInputOutputTypes.push_back(std::move(scopedName));
+                                }
+                                else
+                                {
+                                    if (isInputOutputType(decl.name()))
+                                    {
+                                        std::cout << "[ ERROR ] " << decl.name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
+                                        return false;
+                                    }
+                                }
                             }
                             return true;
                         },
@@ -83,6 +98,7 @@ namespace contractverify
                     decl.definition()
                 )
             );
+            analysisData.scopeStack.pop();
 
             return true;
         }

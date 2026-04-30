@@ -18,6 +18,7 @@ namespace contractverify
         TEMPL_SPEC = 4,  // this is needed to distinguish variables in template specs from normal variable declarations
         FUNC_SIG = 5,  // this is needed to distinguish variables/types in param lists/return types from normal variable declarations
         TYPEDEF = 6,  // this is needed to distinguish local variables (forbidden) from local typedefs (allowed)
+        USING_DECL = 7,  // this is needed to distinguish local variables or class/struct members from using declarations
     };
 
     static std::string getScopedName(const std::vector<std::string>& names, int startIndex = 0)

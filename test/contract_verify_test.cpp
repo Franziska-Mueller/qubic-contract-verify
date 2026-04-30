@@ -188,6 +188,14 @@ namespace contractverify
             "InputOutputTypes6"
         },
         {
+            "test_ok_input_output_7.h",
+            "InputOutputTypes7"
+        },
+        {
+            "test_ok_input_output_8.h",
+            "InputOutputTypes8"
+        },
+        {
             "test_ok_state_data.h",
             "StateData"
         },
@@ -527,6 +535,16 @@ namespace contractverify
             "test_fail_input_output_8.h",
             "[ ERROR ] Pointers are not allowed.\n",
             "InputOutputTypes8"
+        },
+        {
+            "test_fail_input_output_9.h",
+            "[ ERROR ] SomeFunction_input is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes9"
+        },
+        {
+            "test_fail_input_output_10.h",
+            "[ ERROR ] SomeFunction_output is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types.\n",
+            "InputOutputTypes10"
         },
         {
             "test_fail_state_struct_variable.h",
