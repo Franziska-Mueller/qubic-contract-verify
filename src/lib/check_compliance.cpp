@@ -250,6 +250,10 @@ namespace contractverify
             std::cout << "[ ERROR ] Namespace alias is not allowed." << std::endl;
             return false;
 
+        case cppast::CppEntityType::TYPEDEF_DECL_LIST:
+            std::cout << "[ ERROR ] Typedef lists are not allowed. Use separate typedefs instead." << std::endl;
+            return false;
+
         case cppast::CppEntityType::FUNCTION_PTR:
             std::cout << "[ ERROR ] Function pointers are not allowed." << std::endl;
             return false;
@@ -292,9 +296,6 @@ namespace contractverify
 
         case cppast::CppEntityType::TYPEDEF_DECL:
             return checkTypedef(static_cast<const cppast::CppTypedefName&>(entity), stateStructName, analysisData);
-
-        case cppast::CppEntityType::TYPEDEF_DECL_LIST:
-            return checkTypedefList(static_cast<const cppast::CppTypedefList&>(entity), stateStructName, analysisData);
 
         case cppast::CppEntityType::GOTO_STATEMENT:
             return checkGotoStatement(static_cast<const cppast::CppGotoStatement&>(entity), stateStructName, analysisData);

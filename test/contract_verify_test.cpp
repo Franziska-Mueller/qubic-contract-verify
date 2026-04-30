@@ -353,7 +353,7 @@ namespace contractverify
         },
         {
             "test_fail_typedef_list_global.h",
-            "[ ERROR ] `typedef` is not allowed in global scope.\n",
+            "[ ERROR ] Typedef lists are not allowed. Use separate typedefs instead.\n",
             "TypedefListGlobal"
         },
         {
@@ -363,7 +363,7 @@ namespace contractverify
         },
         {
             "test_fail_typedef_list_forbidden_type.h",
-            "[ ERROR ] Pointers are not allowed.\n",
+            "[ ERROR ] Typedef lists are not allowed. Use separate typedefs instead.\n",
             "TypedefListForbiddenType"
         },
         {

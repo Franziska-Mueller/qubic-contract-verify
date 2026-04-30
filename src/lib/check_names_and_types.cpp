@@ -333,22 +333,26 @@ namespace contractverify
         }
 
         analysisData.scopeStack.push(ScopeSpec::TYPEDEF);
-        RETURN_IF_FALSE(checkVar(*def.var(), stateStructName, analysisData));
-        analysisData.scopeStack.pop();
+        const cppast::CppVar& var = *def.var();
+        RETURN_IF_FALSE(checkVar(var, stateStructName, analysisData));
 
-        return true;
-    }
-
-    bool checkTypedefList(const cppast::CppTypedefList& defList, const std::string& stateStructName, AnalysisData& analysisData)
-    {
-        if (analysisData.scopeStack.empty())
+        // typedef can be used to define IO types, e.g. `typedef sint64 SomeFunction_input;`
+        // typedef can also be used to give new names to already allowed types
+        if (isTypeAllowedAsIO(var.varType().baseType(), analysisData))
         {
-            std::cout << "[ ERROR ] `typedef` is not allowed in global scope." << std::endl;
-            return false;
+            std::vector<std::string> scopedName = analysisData.scopeNames;
+            scopedName.push_back(var.varDecl().name());
+            analysisData.additionalInputOutputTypes.push_back(std::move(scopedName));
+        }
+        else
+        {
+            if (isInputOutputType(var.varDecl().name()))
+            {
+                std::cout << "[ ERROR ] " << var.varDecl().name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
+                return false;
+            }
         }
 
-        analysisData.scopeStack.push(ScopeSpec::TYPEDEF);
-        RETURN_IF_FALSE(checkVarList(defList.varList(), stateStructName, analysisData));
         analysisData.scopeStack.pop();
 
         return true;
