@@ -203,15 +203,18 @@ namespace contractverify
         if (std::any_of(allowedInputOutputTypes.begin(), allowedInputOutputTypes.end(), matchesTypename))
             return true;
 
-        // A special case are Array<type, size> and BitArray<size> defined in QPI.
+        // A special case are Array<type, size>, BitArray<size>, and SlowAnySizeArray<type, size> defined in QPI.
         // These are allowed (in case of Array only if the element type is allowed).
         // Note that the size might be specified as name of a constant hence this needs to be considered in the regex.
         std::regex regexArray("Array<(\\w+),\\s*\\w+>");
+        std::regex regexSlowAnySizeArray("SlowAnySizeArray<(\\w+),\\s*\\w+>");
         std::regex regexBitArray("BitArray<\\w+>");
         std::smatch match;
         if (std::regex_match(type, match, regexBitArray))
                 return true;
         if (std::regex_match(type, match, regexArray))
+                return isTypeAllowedAsIO(match[1].str(), analysisData);
+        if (std::regex_match(type, match, regexSlowAnySizeArray))
                 return isTypeAllowedAsIO(match[1].str(), analysisData);
 
         // Another special case are oracle related types:
