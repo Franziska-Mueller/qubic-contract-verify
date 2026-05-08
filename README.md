@@ -2,6 +2,8 @@
 
 This in a tool that automatically checks that C++ files comply with the C++ language feature restrictions Qubic imposes on smart contract (SC) files.
 
+It also support checking of Qubic Oracle Interface definition files.
+
 ## Contract Verify Container Action
 
 This repository provides a docker-based container action that can be used in a GitHub workflow.
@@ -68,3 +70,7 @@ Navigate to your `build/src/<CONFIGURATION>` directory where `CONFIGURATION` is 
 Run the tool on your contract file:
 
 `./contractverify <FILEPATH>`
+
+In order to check an Oracle Interface, run:
+
+`./contractverify --oi <FILEPATH>`
