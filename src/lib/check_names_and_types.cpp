@@ -277,6 +277,15 @@ namespace contractverify
         return false;
     }
 
+    bool isTypeAllowedAsOracleInterfaceFunctionLocal(const std::string& type)
+    {
+        auto matchesTypename = [&](const std::string& s) -> bool { return type.compare(s) == 0; };
+        if (std::any_of(allowedOracleInterfaceFunctionLocalsTypes.begin(), allowedOracleInterfaceFunctionLocalsTypes.end(), matchesTypename))
+            return true;
+
+        return false;
+    }
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, AnalysisData& analysisData)
     {
         analysisData.scopeStack.push(ScopeSpec::TEMPL_SPEC);

@@ -49,6 +49,7 @@ namespace contractverify
         std::stack<bool> allowedAsIOStruct; // this stack tracks whether the struct/class currently being analyzed may be allowed as input/output struct
         std::vector<std::string> additionalScopePrefixes;
         std::vector<std::vector<std::string>> additionalInputOutputTypes;
+        std::vector<std::string> oracleInterfaceFuncAllowedLocalVars;
 
         bool isDirectlyInClassOrStruct() const
         {
@@ -251,5 +252,20 @@ namespace contractverify
         // OI::*::OracleQuery
         // OI::*::OracleReply
         // OracleNotificationInput<*>
+    };
+
+
+    static const std::vector<std::string> allowedOracleInterfaceFunctionLocalsTypes = {
+        "bool",
+        "bit",
+        "sint8",
+        "uint8",
+        "sint16",
+        "uint16",
+        "sint32",
+        "uint32",
+        "sint64",
+        "uint64",
+        "uint128",
     };
 }

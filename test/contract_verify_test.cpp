@@ -731,6 +731,10 @@ namespace contractverify
             "oracle_interfaces/test_ok_Mock.h",
             "Mock"
         },
+        {
+            "oracle_interfaces/test_ok_Price.h",
+            "Price"
+        },
     };
 
     FailureTestInfo failureOracleInterfaceTestInfos[] =
@@ -971,11 +975,6 @@ namespace contractverify
             "PointerDeclaration"
         },
         {
-            "test_fail_local_variable.h",
-            "[ ERROR ] Local variables are not allowed, found variable with name fee.\n",
-            "LocalVariable"
-        },
-        {
             "test_fail_scope_resolution_function_call.h",
             "[ ERROR ] Scope resolution with prefix someNamespace is not allowed.\n",
             "ScopeResolutionFunctionCall"
@@ -1086,9 +1085,14 @@ namespace contractverify
             "Function"
         },
         {
-            "oracle_interfaces/test_fail_Price.h",
-            "[ ERROR ] Local variables are not allowed, found variable with name period.\n",
-            "Price"
+            "oracle_interfaces/test_fail_forbidden_locals_type.h",
+            "[ ERROR ] Found local variable of forbidden type with name forbidden.\n",
+            "ForbiddenLocalsType"
+        },
+        {
+            "oracle_interfaces/test_fail_too_many_locals.h",
+            "[ ERROR ] Too many local variables. Variable with name var11 exceeds the limit.\n",
+            "TooManyLocals"
         },
     };
 

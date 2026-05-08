@@ -24,6 +24,8 @@ namespace contractverify
 
     bool isTypeAllowedAsIO(std::string type, const AnalysisData& analysisData);
 
+    bool isTypeAllowedAsOracleInterfaceFunctionLocal(const std::string& type);
+
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, AnalysisData& analysisData);
 
     bool checkTypedef(const cppast::CppTypedefName& def, const std::string& stateStructName, AnalysisData& analysisData);
