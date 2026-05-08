@@ -5,20 +5,45 @@
 
 #include "check_compliance.h"
 
+void printUsage()
+{
+    std::cerr
+        << "\nUsage: ./contractverify [--oi] <FILEPATH>\n\n"
+        << "    The switch --oi means that <FILEPATH> points to an oracle interface instead of a contract." << std::endl;
+}
 
 int main(int argc, char** argv)
 {
-    if (argc < 2) 
+    contractverify::FileType filetype = contractverify::FileType::CONTRACT;
+    std::string filepath;
+
+    if (argc < 2)
     {
-        std::cerr << "[ ERROR ] Mandatory filepath argument was not provided." << std::endl
-            << "Usage: ./contractverify <FILEPATH>" << std::endl;
+        std::cerr << "[ ERROR ] Mandatory filepath argument was not provided." << std::endl;
+        printUsage();
         return 1;
     }
-    else if (argc > 2)
+    else if (argc == 2)
     {
-        std::cout << "[ WARNING ] Too many command line arguments provided, excessive arguments will be ignored." << std::endl;
+        filepath = std::string(argv[1]);
     }
-    auto filepath = std::string(argv[1]);
+    else if (argc == 3)
+    {
+        if (strcmp(argv[1], "--oi") != 0)
+        {
+            std::cerr << "[ ERROR ] Unsupported argument " << argv[1] << std::endl;
+            printUsage();
+            return 1;
+        }
+        filetype = contractverify::FileType::ORACLE_INTERFACE;
+        filepath = std::string(argv[2]);
+    }
+    else
+    {
+        std::cerr << "[ ERROR ] Too many command line arguments provided." << std::endl;
+        printUsage();
+        return 1;
+    }
 
     std::unique_ptr<cppast::CppCompound> contractAST = contractverify::parseAST(filepath);
 
@@ -28,14 +53,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (contractverify::checkCompliance(*contractAST))
+    std::string filetypeString = (filetype == contractverify::FileType::CONTRACT) ? "Contract" : "Oracle interface";
+
+    if (contractverify::checkCompliance(*contractAST, filetype))
     {
-        std::cout << "Contract compliance check PASSED" << std::endl;
+        std::cout << filetypeString << " compliance check PASSED" << std::endl;
         return 0;
     }
     else
     {
-        std::cout << "Contract compliance check FAILED" << std::endl;
+        std::cout << filetypeString << " compliance check FAILED" << std::endl;
         return 1;
     }
 }

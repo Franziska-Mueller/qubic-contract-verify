@@ -179,8 +179,11 @@ namespace contractverify
         return true;
     }
 
-    bool isInputOutputType(std::string name)
+    bool isInputOutputType(std::string name, const AnalysisData& analysisData)
     {
+        if (analysisData.fileType == FileType::ORACLE_INTERFACE)
+            return true;
+
         // First remove all whitespace
         std::erase_if(name, [](unsigned char c) { return std::isspace(c); });
 
@@ -349,7 +352,7 @@ namespace contractverify
         }
         else
         {
-            if (isInputOutputType(var.varDecl().name()))
+            if (isInputOutputType(var.varDecl().name(), analysisData))
             {
                 std::cout << "[ ERROR ] " << var.varDecl().name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
                 return false;

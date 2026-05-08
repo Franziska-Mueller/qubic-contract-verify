@@ -20,7 +20,7 @@ namespace contractverify
 
     bool isScopeResolutionAllowed(std::string name, const std::vector<std::string>& additionalScopePrefixes);
 
-    bool isInputOutputType(std::string name);
+    bool isInputOutputType(std::string name, const AnalysisData& analysisData);
 
     bool isTypeAllowedAsIO(std::string type, const AnalysisData& analysisData);
 

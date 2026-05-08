@@ -113,7 +113,8 @@ namespace contractverify
         }
 
         // Variables directly in the state struct must be in a nested struct (e.g., StateData)
-        if (!analysisData.scopeStack.empty()
+        if (analysisData.fileType == FileType::CONTRACT
+            && !analysisData.scopeStack.empty()
             && (analysisData.scopeStack.top() == ScopeSpec::STRUCT || analysisData.scopeStack.top() == ScopeSpec::CLASS)
             && analysisData.scopeNames.size() == 1
             && analysisData.scopeNames[0] == stateStructName)

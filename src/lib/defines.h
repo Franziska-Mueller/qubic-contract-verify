@@ -33,8 +33,16 @@ namespace contractverify
         return result.str();
     }
 
+    enum FileType
+    {
+        CONTRACT = 0,
+        ORACLE_INTERFACE = 1,
+    };
+
     struct AnalysisData
     {
+        FileType fileType;
+
         // data that will be collected while traversing the AST
         std::stack<ScopeSpec> scopeStack; // empty scope stack means global scope
         std::vector<std::string> scopeNames;

@@ -70,7 +70,7 @@ namespace contractverify
                                 }
                             }
 
-                            if (!allowedAsIO && isInputOutputType(decl.name()))
+                            if (!allowedAsIO && isInputOutputType(decl.name(), analysisData))
                             {
                                 std::cout << "[ ERROR ] " << decl.name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
                                 return false;
@@ -90,7 +90,7 @@ namespace contractverify
                         [&](const std::unique_ptr<cppast::CppCompound>& compound) -> bool
                         {
                             // For ease of analysis, defining a compound type as IO type via a using declaration is not allowed.
-                            if (isInputOutputType(decl.name()))
+                            if (isInputOutputType(decl.name(), analysisData))
                             {
                                 std::cout << "[ ERROR ] " << decl.name() << " is not allowed as input/output type. For ease of analysis, defining a compound type as IO type via a using declaration is forbidden." << std::endl;
                                 return false;
@@ -200,7 +200,8 @@ namespace contractverify
             break;
         }
 
-        bool checkSucceeded = compound.visitAll([&](const cppast::CppEntity& ent) -> bool { return checkEntity(ent, stateStructName, analysisData); });
+        if (!compound.visitAll([&](const cppast::CppEntity& ent) -> bool { return checkEntity(ent, stateStructName, analysisData); }))
+            return false;
 
         if (allowedAsIOPushed)
         {
@@ -212,9 +213,12 @@ namespace contractverify
             else
             {
                 // analyzed struct/class is not allowed as input/output type
-                if (isInputOutputType(compound.name()))
+                if (isInputOutputType(compound.name(), analysisData))
                 {
-                    std::cout << "[ ERROR ] " << compound.name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
+                    std::string name = compound.name();
+                    if (name.empty())
+                        name = "unnamed struct";
+                    std::cout << "[ ERROR ] " << name << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
                     return false;
                 }
             }
@@ -225,7 +229,7 @@ namespace contractverify
         if (scopeNamesPushed)
             analysisData.scopeNames.pop_back();
 
-        return checkSucceeded;
+        return true;
     }
 
     bool checkEntity(const cppast::CppEntity& entity, const std::string& stateStructName, AnalysisData& analysisData)
@@ -350,16 +354,27 @@ namespace contractverify
         }
     }
 
-    bool checkCompliance(const cppast::CppCompound& compound, const std::string& stateStructName)
+    bool checkCompliance(const cppast::CppCompound& compound, const std::string& stateStructName, FileType fileType)
     {
         AnalysisData analysisData;
+        analysisData.fileType = fileType;
         return checkEntity(compound, stateStructName, analysisData);
     }
 
-    bool checkCompliance(const cppast::CppCompound& compound)
+    bool checkCompliance(const cppast::CppCompound& compound, FileType fileType)
     {
-        std::string stateStructName = contractverify::findStateStructName(compound);
-        return checkCompliance(compound, stateStructName);
+        std::string stateStructName;
+        if (fileType == FileType::CONTRACT)
+        {
+            stateStructName = findStateStructName(compound);
+        }
+        else if (fileType == FileType::ORACLE_INTERFACE)
+        {
+            stateStructName = findOracleInterfaceStructNameAndCheckTopLevel(compound);
+        }
+        if (stateStructName.empty())
+            return false;
+        return checkCompliance(compound, stateStructName, fileType);
     }
 
     std::unique_ptr<cppast::CppCompound> parseAST(const std::string& filepath)
@@ -408,6 +423,69 @@ namespace contractverify
                 return true;
             }
         );
+
+        if (name.empty())
+            std::cout << "[ ERROR ] The contract must contain a global-scope struct that is derived from ContractBase." << std::endl;
+
+        return name;
+    }
+
+    std::string findOracleInterfaceStructNameAndCheckTopLevel(const cppast::CppCompound& ast)
+    {
+        std::string name = "";
+        unsigned int numStructs = 0;
+        bool foundForbiddenEntities = false;
+
+        if (ast.compoundType() != cppast::CppCompoundType::FILE)
+        {
+            std::cout << "[ ERROR ] Need a top-level CppCompound (compound type FILE) for finding the oracle interface struct name." << std::endl;
+            return name;
+        }
+
+        // `visitAll` visits the entities sequentially, so we do not need any lock for `name` and others
+        ast.visitAll([&](const cppast::CppEntity& entity) -> bool
+            {
+                switch (entity.entityType())
+                {
+                case cppast::CppEntityType::COMPOUND:
+                {
+                    const auto& compound = static_cast<const cppast::CppCompound&>(entity);
+                    if (compound.compoundType() == cppast::CppCompoundType::STRUCT || compound.compoundType() == cppast::CppCompoundType::CLASS)
+                    {
+                        // one struct or class is allowed
+                        name = compound.name();
+                        ++numStructs;
+                        return true;
+                    }
+                }
+
+                case cppast::CppEntityType::DOCUMENTATION_COMMENT:
+                case cppast::CppEntityType::USING_NAMESPACE:
+                    // allowed
+                    return true;
+
+                case cppast::CppEntityType::USING_DECL:
+                case cppast::CppEntityType::TYPEDEF_DECL:
+                case cppast::CppEntityType::TYPEDEF_DECL_LIST:
+                case cppast::CppEntityType::FUNCTION_PTR:
+                case cppast::CppEntityType::NAMESPACE_ALIAS:
+                case cppast::CppEntityType::PREPROCESSOR:
+                    // forbidden but checked later -> allow for now to print more specific error message
+                    return true;
+                }
+
+                foundForbiddenEntities = true;
+
+                // need to return true in any case because `visitAll` interrupts when the callback returns false on an entity
+                return true;
+            }
+        );
+
+        if (numStructs != 1 || foundForbiddenEntities)
+        {
+            std::cout << "[ ERROR ] The oracle interface must contain exactly one struct definition. Other definition/declarations are forbidden." << std::endl;
+            name = "";
+        }
 
         return name;
     }
