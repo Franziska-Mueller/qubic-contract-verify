@@ -2,8 +2,8 @@ using namespace QPI;
 
 union forbiddenUnion
 {
-    int a;
-    int b;
+    uint32 a;
+    uint32 b;
 };
 
 struct TESTCON : public ContractBase {};

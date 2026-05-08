@@ -3,8 +3,8 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    struct StateData
+    id dummy()
     {
-        SomeStruct dummy = {1, 2, 3};
-    };
+        return id {1, 2, 3, 0};
+    }
 };

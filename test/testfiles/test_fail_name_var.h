@@ -4,6 +4,6 @@ struct TESTCON : public ContractBase
 {
     struct StateData
     {
-        int __forbiddenName;
+        uint32 __forbiddenName;
     };
 };

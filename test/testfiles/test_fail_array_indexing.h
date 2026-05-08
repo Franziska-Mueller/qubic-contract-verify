@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int dummy = someGlobalArray[0];
+        uint32 dummy = someGlobalArray[0];
     };
 };

@@ -3,7 +3,7 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    bool dummyFunc(int x)
+    bool dummyFunc(uint32 x)
     {
         switch (x)
         {

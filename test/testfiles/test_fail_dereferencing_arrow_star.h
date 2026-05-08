@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int dummy = someGlobalPtr->*giveInt();
+        uint32 dummy = someGlobalPtr->*giveInt();
     };
 };

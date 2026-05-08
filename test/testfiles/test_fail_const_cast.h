@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int& dummy = const_cast<int&>(someConstIntVar);
+        uint32& dummy = const_cast<uint32&>(someConstIntVar);
     };
 };

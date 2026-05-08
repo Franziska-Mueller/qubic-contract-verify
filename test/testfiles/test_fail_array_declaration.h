@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int forbiddenArray[20];
+        uint32 forbiddenArray[20];
     };
 };

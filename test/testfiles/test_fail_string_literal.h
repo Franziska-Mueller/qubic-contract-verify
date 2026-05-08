@@ -3,8 +3,8 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    struct StateData
+    void func()
     {
-        auto forbiddenString = "I am a string literal";
-    };
+        otherFunc("I am a string literal");
+    }
 };

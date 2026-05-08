@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int dummy = __restrictedVariable;
+        uint32 dummy = __restrictedVariable;
     };
 };

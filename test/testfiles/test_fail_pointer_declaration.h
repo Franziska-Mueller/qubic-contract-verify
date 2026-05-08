@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int* forbiddenPtr;
+        uint32* forbiddenPtr;
     };
 };

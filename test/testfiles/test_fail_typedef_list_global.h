@@ -1,5 +1,5 @@
 using namespace QPI;
 
-typedef int MyInt, WholeNumber;
+typedef uint32 MyInt, WholeNumber;
 
 struct TESTCON : public ContractBase {};
