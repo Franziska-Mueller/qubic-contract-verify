@@ -193,8 +193,8 @@ namespace contractverify
         "TESTEXA::QueryQpiFunctions_input",
         "TESTEXA::QueryQpiFunctions_output",
         // Simple numeric types
-        "bool",
         "bit",
+        // bool isn't allowed in input due to the issue explained in https://github.com/qubic/core/pull/822
         "sint8",
         "uint8",
         "sint16",
