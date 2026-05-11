@@ -3,9 +3,8 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    struct StateData
+    auto func(uint32 dummy = 42)
     {
-        int dummy = 42;
-        auto addr = &dummy;
-    };
+        return &dummy;
+    }
 };

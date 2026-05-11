@@ -3,11 +3,11 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 private:
-    typedef int MyInt;
+    typedef uint32 MyInt;
 
 public:
     PUBLIC_FUNCTION(GetFee)
     {
-        typedef int WholeNumber;
+        typedef uint32 WholeNumber;
     }
 };

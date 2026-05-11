@@ -76,6 +76,7 @@ namespace contractverify
             RETURN_IF_FALSE(checkCompound(*func.defn(), stateStructName, analysisData));
 
         analysisData.scopeStack.pop();
+        analysisData.oracleInterfaceFuncAllowedLocalVars.clear();
         return true;
     }
 

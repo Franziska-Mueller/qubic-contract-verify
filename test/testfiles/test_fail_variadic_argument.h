@@ -3,7 +3,7 @@ using namespace QPI;
 struct TESTCON : public ContractBase
 {
 public:
-    int dummyFunction(int i...)
+    uint32 dummyFunction(uint32 i...)
     {
         return 0;
     }

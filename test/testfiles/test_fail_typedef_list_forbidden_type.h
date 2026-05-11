@@ -2,5 +2,5 @@ using namespace QPI;
 
 struct TESTCON : public ContractBase
 {
-    typedef int* MyIntPtr, WholeNumberPtr;
+    typedef uint32* MyIntPtr, WholeNumberPtr;
 };

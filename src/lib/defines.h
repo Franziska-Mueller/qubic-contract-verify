@@ -33,14 +33,23 @@ namespace contractverify
         return result.str();
     }
 
+    enum FileType
+    {
+        CONTRACT = 0,
+        ORACLE_INTERFACE = 1,
+    };
+
     struct AnalysisData
     {
+        FileType fileType;
+
         // data that will be collected while traversing the AST
         std::stack<ScopeSpec> scopeStack; // empty scope stack means global scope
         std::vector<std::string> scopeNames;
         std::stack<bool> allowedAsIOStruct; // this stack tracks whether the struct/class currently being analyzed may be allowed as input/output struct
         std::vector<std::string> additionalScopePrefixes;
         std::vector<std::vector<std::string>> additionalInputOutputTypes;
+        std::vector<std::string> oracleInterfaceFuncAllowedLocalVars;
 
         bool isDirectlyInClassOrStruct() const
         {
@@ -184,8 +193,8 @@ namespace contractverify
         "TESTEXA::QueryQpiFunctions_input",
         "TESTEXA::QueryQpiFunctions_output",
         // Simple numeric types
-        "bool",
         "bit",
+        // bool isn't allowed in input due to the issue explained in https://github.com/qubic/core/pull/822
         "sint8",
         "uint8",
         "sint16",
@@ -239,8 +248,24 @@ namespace contractverify
 
         // BitArray<SIZE>
         // Array of allowed type...
+        // SlowAnySizeArray of allowed type...
         // OI::*::OracleQuery
         // OI::*::OracleReply
         // OracleNotificationInput<*>
+    };
+
+
+    static const std::vector<std::string> allowedOracleInterfaceFunctionLocalsTypes = {
+        "bool",
+        "bit",
+        "sint8",
+        "uint8",
+        "sint16",
+        "uint16",
+        "sint32",
+        "uint32",
+        "sint64",
+        "uint64",
+        "uint128",
     };
 }

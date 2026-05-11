@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int dummy = addOne(12);
+        uint32 dummy = addOne(12);
     };
 };

@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     struct StateData
     {
-        int dummy = *someGlobalIntPointer;
+        uint32 dummy = *someGlobalIntPointer;
     };
 };

@@ -2,4 +2,4 @@ using namespace QPI;
 
 struct TESTCON : public ContractBase {};
 
-void doesNotStartWithStateStructName(int i) {};
+void doesNotStartWithStateStructName(uint32 i) {};

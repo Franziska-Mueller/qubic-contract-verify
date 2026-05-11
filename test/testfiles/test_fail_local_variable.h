@@ -5,6 +5,6 @@ struct TESTCON : public ContractBase
 public:
     PUBLIC_FUNCTION(GetFee)
     {
-        int fee = 123;
+        uint32 fee = 123;
     }
 };

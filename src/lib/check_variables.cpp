@@ -108,12 +108,31 @@ namespace contractverify
         if (!(analysisData.scopeStack.empty() || analysisData.scopeStack.top() == ScopeSpec::STRUCT || analysisData.scopeStack.top() == ScopeSpec::CLASS
             || analysisData.scopeStack.top() == ScopeSpec::FUNC_SIG || analysisData.scopeStack.top() == ScopeSpec::TYPEDEF))
         {
-            std::cout << "[ ERROR ] Local variables are not allowed, found variable with name " << var.name() << "." << std::endl;
-            return false;
+            if (analysisData.fileType == FileType::ORACLE_INTERFACE)
+            {
+                if (!isTypeAllowedAsOracleInterfaceFunctionLocal(var.varType().baseType()))
+                {
+                    std::cout << "[ ERROR ] Found local variable of forbidden type with name " << var.name() << "." << std::endl;
+                    return false;
+                }
+
+                analysisData.oracleInterfaceFuncAllowedLocalVars.push_back(var.name());
+                if (analysisData.oracleInterfaceFuncAllowedLocalVars.size() > 10)
+                {
+                    std::cout << "[ ERROR ] Too many local variables. Variable with name " << var.name() << " exceeds the limit." << std::endl;
+                    return false;
+                }
+            }
+            else
+            {
+                std::cout << "[ ERROR ] Local variables are not allowed, found variable with name " << var.name() << "." << std::endl;
+                return false;
+            }
         }
 
         // Variables directly in the state struct must be in a nested struct (e.g., StateData)
-        if (!analysisData.scopeStack.empty()
+        if (analysisData.fileType == FileType::CONTRACT
+            && !analysisData.scopeStack.empty()
             && (analysisData.scopeStack.top() == ScopeSpec::STRUCT || analysisData.scopeStack.top() == ScopeSpec::CLASS)
             && analysisData.scopeNames.size() == 1
             && analysisData.scopeNames[0] == stateStructName)

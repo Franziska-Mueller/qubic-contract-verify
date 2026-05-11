@@ -179,8 +179,11 @@ namespace contractverify
         return true;
     }
 
-    bool isInputOutputType(std::string name)
+    bool isInputOutputType(std::string name, const AnalysisData& analysisData)
     {
+        if (analysisData.fileType == FileType::ORACLE_INTERFACE)
+            return true;
+
         // First remove all whitespace
         std::erase_if(name, [](unsigned char c) { return std::isspace(c); });
 
@@ -203,15 +206,18 @@ namespace contractverify
         if (std::any_of(allowedInputOutputTypes.begin(), allowedInputOutputTypes.end(), matchesTypename))
             return true;
 
-        // A special case are Array<type, size> and BitArray<size> defined in QPI.
+        // A special case are Array<type, size>, BitArray<size>, and SlowAnySizeArray<type, size> defined in QPI.
         // These are allowed (in case of Array only if the element type is allowed).
         // Note that the size might be specified as name of a constant hence this needs to be considered in the regex.
         std::regex regexArray("Array<(\\w+),\\s*\\w+>");
+        std::regex regexSlowAnySizeArray("SlowAnySizeArray<(\\w+),\\s*\\w+>");
         std::regex regexBitArray("BitArray<\\w+>");
         std::smatch match;
         if (std::regex_match(type, match, regexBitArray))
                 return true;
         if (std::regex_match(type, match, regexArray))
+                return isTypeAllowedAsIO(match[1].str(), analysisData);
+        if (std::regex_match(type, match, regexSlowAnySizeArray))
                 return isTypeAllowedAsIO(match[1].str(), analysisData);
 
         // Another special case are oracle related types:
@@ -266,6 +272,15 @@ namespace contractverify
                 return type.compare(sCommonPrefixRemoved) == 0; 
             };
         if (std::any_of(analysisData.additionalInputOutputTypes.begin(), analysisData.additionalInputOutputTypes.end(), matchesScopedTypename))
+            return true;
+
+        return false;
+    }
+
+    bool isTypeAllowedAsOracleInterfaceFunctionLocal(const std::string& type)
+    {
+        auto matchesTypename = [&](const std::string& s) -> bool { return type.compare(s) == 0; };
+        if (std::any_of(allowedOracleInterfaceFunctionLocalsTypes.begin(), allowedOracleInterfaceFunctionLocalsTypes.end(), matchesTypename))
             return true;
 
         return false;
@@ -346,7 +361,7 @@ namespace contractverify
         }
         else
         {
-            if (isInputOutputType(var.varDecl().name()))
+            if (isInputOutputType(var.varDecl().name(), analysisData))
             {
                 std::cout << "[ ERROR ] " << var.varDecl().name() << " is not allowed as input/output type. The input and output structs of contract user procedures and functions may only use integer and boolean types (such as uint64, sint8, bit) as well as id, Array, and BitArray, and struct types containing only allowed types." << std::endl;
                 return false;

@@ -1,6 +1,6 @@
 struct TESTCON : public ContractBase
 {
-    int dummyFunc(int x)
+    uint32 dummyFunc(uint32 x)
     {
         return someNamespace::addOne(x);
     }

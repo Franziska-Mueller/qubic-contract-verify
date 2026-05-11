@@ -20,9 +20,11 @@ namespace contractverify
 
     bool isScopeResolutionAllowed(std::string name, const std::vector<std::string>& additionalScopePrefixes);
 
-    bool isInputOutputType(std::string name);
+    bool isInputOutputType(std::string name, const AnalysisData& analysisData);
 
     bool isTypeAllowedAsIO(std::string type, const AnalysisData& analysisData);
+
+    bool isTypeAllowedAsOracleInterfaceFunctionLocal(const std::string& type);
 
     bool checkTemplSpec(const cppast::CppTemplateParams& params, const std::string& stateStructName, AnalysisData& analysisData);
 

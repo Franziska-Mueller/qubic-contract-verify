@@ -1,5 +1,5 @@
 using namespace QPI;
 
-int FORBIDDEN_GLOBAL_VAR = 0;
+uint32 FORBIDDEN_GLOBAL_VAR = 0;
 
 struct TESTCON : public ContractBase {};
