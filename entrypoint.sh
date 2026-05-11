@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Split the provided input based on the comma delimiter
 filepaths=$(echo "$1" | tr "," "\n")
