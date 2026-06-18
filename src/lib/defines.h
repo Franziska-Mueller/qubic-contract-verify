@@ -84,6 +84,8 @@ namespace contractverify
         "POST_INCOMING_TRANSFER",
         "POST_INCOMING_TRANSFER_WITH_LOCALS",
         "EXPAND",
+        "MIGRATE",
+        "MIGRATE_WITH_LOCALS",
         "LOG_DEBUG",
         "LOG_ERROR",
         "LOG_INFO",
