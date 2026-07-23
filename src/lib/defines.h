@@ -147,6 +147,8 @@ namespace contractverify
         "AssetPossessionSelect",
         // oracles
         "OI",
+        // outsourced computation interfaces
+        "OCI",
         // other contract names
         "QX",
         "QUOTTERY",
